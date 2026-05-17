@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# face scanner / rPPG (Python)
+tools/ngrok/ngrok.exe
+.venv/
+__pycache__/
+*.pyc
+vision/models/face_landmarker.task
+vision/uploads/
+vision/user_profile.json
