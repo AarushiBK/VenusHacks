@@ -145,3 +145,33 @@ export function getMoodTheme(value: number): MoodTheme {
     ...interpolateStops(value),
   };
 }
+
+function moodSpectrumMidColor(mood: number): string {
+  const value = clampMood(mood);
+  let i = 0;
+  while (i < MOOD_STOPS.length - 1 && value > MOOD_STOPS[i + 1].at) i += 1;
+
+  const start = MOOD_STOPS[i];
+  const end = MOOD_STOPS[Math.min(i + 1, MOOD_STOPS.length - 1)];
+  const span = end.at - start.at;
+  const t = span === 0 ? 0 : (value - start.at) / span;
+
+  return lerpHex(start.gradient[1], end.gradient[1], t);
+}
+
+/** Full vertical spectrum for charts: pleasant (top) → unpleasant (bottom), same stops as the mood slider. */
+export function getMoodSpectrumChartBackground(): string {
+  const colorStops: { pct: number; color: string }[] = [];
+
+  for (let mood = 0; mood <= 100; mood += 4) {
+    colorStops.push({
+      pct: 100 - mood,
+      color: moodSpectrumMidColor(mood),
+    });
+  }
+
+  colorStops.sort((a, b) => a.pct - b.pct);
+
+  const stops = colorStops.map(({ color, pct }) => `${color} ${pct}%`).join(", ");
+  return `linear-gradient(180deg, ${stops})`;
+}

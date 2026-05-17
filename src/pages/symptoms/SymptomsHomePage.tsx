@@ -4,7 +4,10 @@ import {
   ShowInChartsLink,
   SymptomSummaryCard,
 } from "../../components/symptoms/SymptomSummaryCard";
-import { getLogsForDay, getTodayIsoDate } from "../../lib/symptomLogsStorage";
+import {
+  getLogsForDay,
+  getTodayIsoDate,
+} from "../../lib/symptomLogsStorage";
 import type { SymptomLogEntry } from "../../types/symptoms";
 
 function formatTodayHeading() {
@@ -15,8 +18,35 @@ function formatTodayHeading() {
 
 function partitionLogs(entries: SymptomLogEntry[]) {
   const daily = entries.find((e) => e.kind === "daily");
-  const moments = entries.filter((e) => e.kind === "moment");
+  const moments = entries
+    .filter((e) => e.kind === "moment")
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   return { daily, moments };
+}
+
+/** Re-read today's logs when the local calendar day changes (e.g. after midnight). */
+function useTodayDateKey() {
+  const [todayKey, setTodayKey] = useState(getTodayIsoDate);
+
+  useEffect(() => {
+    const sync = () => {
+      const next = getTodayIsoDate();
+      setTodayKey((prev) => (prev === next ? prev : next));
+    };
+    const interval = window.setInterval(sync, 60_000);
+    document.addEventListener("visibilitychange", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", sync);
+      window.removeEventListener("focus", sync);
+    };
+  }, []);
+
+  return todayKey;
 }
 
 export function SymptomsHomePage() {
@@ -25,6 +55,7 @@ export function SymptomsHomePage() {
     (location.state as { fromLogged?: boolean } | null)?.fromLogged,
   );
   const [visible, setVisible] = useState(!fromLogged);
+  const todayKey = useTodayDateKey();
 
   useEffect(() => {
     if (!fromLogged) return;
@@ -41,8 +72,7 @@ export function SymptomsHomePage() {
     .filter(Boolean)
     .join(" ");
 
-  const today = getTodayIsoDate();
-  const todayLogs = getLogsForDay(today);
+  const todayLogs = getLogsForDay(todayKey);
   const { daily, moments } = partitionLogs(todayLogs);
 
   return (

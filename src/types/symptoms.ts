@@ -17,6 +17,8 @@ export interface SymptomLogEntry {
   /** User-entered symptoms not in the catalog */
   customSymptoms?: string[];
   createdAt: string;
+  /** Local calendar day (YYYY-MM-DD) when the log was saved */
+  dateKey?: string;
 }
 
 export interface SymptomLogDraft {

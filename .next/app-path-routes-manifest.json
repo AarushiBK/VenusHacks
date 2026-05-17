@@ -1,0 +1,13 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/vitals/route": "/api/vitals",
+  "/carechain/page": "/carechain",
+  "/health/page": "/health",
+  "/metrics/page": "/metrics",
+  "/login/page": "/login",
+  "/page": "/",
+  "/signup/page": "/signup",
+  "/motherboard/page": "/motherboard",
+  "/vitals/page": "/vitals",
+  "/welcome/page": "/welcome"
+}
