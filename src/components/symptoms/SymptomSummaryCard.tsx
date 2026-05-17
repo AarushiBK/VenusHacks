@@ -3,6 +3,7 @@ import { getMoodLabel } from "../../lib/moodLabels";
 import { getSymptomLabelsForEntry } from "../../lib/symptomDisplay";
 import { getMoodTheme } from "../../lib/moodTheme";
 import type { SymptomLogEntry } from "../../types/symptoms";
+import { MomentarySymptomsTimeline } from "./MomentarySymptomsTimeline";
 import { MoodFlower } from "./MoodFlower";
 
 interface SymptomSummaryCardProps {
@@ -26,9 +27,7 @@ export function SymptomSummaryCard({ dailyEntry, momentEntries }: SymptomSummary
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
             Momentary symptoms
           </p>
-          <p className="mt-2 text-sm text-muted">
-            {momentEntries.length === 0 ? "No entries" : `${momentEntries.length} check-in${momentEntries.length === 1 ? "" : "s"} today`}
-          </p>
+          <MomentarySymptomsTimeline entries={momentEntries} />
         </section>
       </article>
     );
@@ -58,11 +57,7 @@ export function SymptomSummaryCard({ dailyEntry, momentEntries }: SymptomSummary
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
           Momentary symptoms
         </p>
-        <p className="mt-2 text-sm text-muted">
-          {momentEntries.length === 0
-            ? "No entries"
-            : `${momentEntries.length} check-in${momentEntries.length === 1 ? "" : "s"} today`}
-        </p>
+        <MomentarySymptomsTimeline entries={momentEntries} />
       </section>
     </article>
   );

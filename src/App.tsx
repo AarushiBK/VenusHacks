@@ -8,6 +8,7 @@ import { SymptomChartsPage } from "./pages/symptoms/SymptomChartsPage";
 import { SymptomLogTypePage } from "./pages/symptoms/SymptomLogTypePage";
 import { SymptomMoodPage } from "./pages/symptoms/SymptomMoodPage";
 import { SymptomSelectPage } from "./pages/symptoms/SymptomSelectPage";
+import { SymptomLoggedPage } from "./pages/symptoms/SymptomLoggedPage";
 import { SymptomsHomePage } from "./pages/symptoms/SymptomsHomePage";
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="log" element={<SymptomLogTypePage />} />
         <Route path="log/mood" element={<SymptomMoodPage />} />
         <Route path="log/select" element={<SymptomSelectPage />} />
+        <Route path="log/done" element={<SymptomLoggedPage />} />
         <Route path="charts" element={<SymptomChartsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

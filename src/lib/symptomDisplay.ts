@@ -1,5 +1,6 @@
 import { getSymptomById, getSymptomPillLabel, SYMPTOMS_CATALOG } from "../constants/symptomsCatalog";
 import type { SymptomLogEntry } from "../types/symptoms";
+import { getMoodLabel } from "./moodLabels";
 
 export function normalizeCustomSymptom(text: string): string {
   return text.trim().replace(/\s+/g, " ");
@@ -16,6 +17,20 @@ export function getSymptomLabelsForEntry(entry: Pick<SymptomLogEntry, "symptomId
 
 export function hasAnySymptoms(entry: Pick<SymptomLogEntry, "symptomIds" | "customSymptoms">): boolean {
   return entry.symptomIds.length > 0 || (entry.customSymptoms?.length ?? 0) > 0;
+}
+
+export function getMomentaryEntryPrimaryLabel(
+  entry: Pick<SymptomLogEntry, "symptomIds" | "customSymptoms" | "mood">,
+): string {
+  const labels = getSymptomLabelsForEntry(entry);
+  if (labels.length === 0) return getMoodLabel(entry.mood);
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]}, ${labels[1]}`;
+  return `${labels[0]}, ${labels[1]} +${labels.length - 2}`;
+}
+
+export function formatMomentaryTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
 /** True if search text exactly matches a catalog symptom (user should pick the pill instead). */

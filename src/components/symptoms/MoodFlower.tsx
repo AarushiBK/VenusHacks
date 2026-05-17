@@ -3,12 +3,14 @@ import { getMoodTheme } from "../../lib/moodTheme";
 
 interface MoodFlowerProps {
   mood: number;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
 }
+
+const SIZE_DIM = { lg: 200, md: 120, sm: 44 } as const;
 
 export function MoodFlower({ mood, size = "lg" }: MoodFlowerProps) {
   const theme = getMoodTheme(mood);
-  const dim = size === "lg" ? 200 : 120;
+  const dim = SIZE_DIM[size];
 
   return (
     <div
@@ -35,8 +37,8 @@ export function MoodFlower({ mood, size = "lg" }: MoodFlowerProps) {
       <span
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-lg"
         style={{
-          width: size === "lg" ? "28%" : "32%",
-          height: size === "lg" ? "28%" : "32%",
+          width: size === "lg" ? "28%" : size === "md" ? "32%" : "34%",
+          height: size === "lg" ? "28%" : size === "md" ? "32%" : "34%",
           background: `radial-gradient(circle at 35% 30%, hsl(${theme.hue} 75% 72%), hsl(${theme.hue} 55% 48%))`,
         }}
       />

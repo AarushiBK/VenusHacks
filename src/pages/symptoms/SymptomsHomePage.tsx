@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   ShowInChartsLink,
@@ -21,7 +20,7 @@ function partitionLogs(entries: SymptomLogEntry[]) {
 
 export function SymptomsHomePage() {
   const today = getTodayIsoDate();
-  const todayLogs = useMemo(() => getLogsForDay(today), [today]);
+  const todayLogs = getLogsForDay(today);
   const { daily, moments } = partitionLogs(todayLogs);
 
   return (

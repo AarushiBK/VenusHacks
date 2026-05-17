@@ -39,7 +39,7 @@ export function SymptomSelectPage() {
         draft.customSymptoms.length > 0 ? draft.customSymptoms : undefined,
     });
     resetDraft();
-    navigate("/symptoms", { replace: true });
+    navigate("/symptoms/log/done", { replace: true });
   }
 
   function handleQueryChange(value: string) {
