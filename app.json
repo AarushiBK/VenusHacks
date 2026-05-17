@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Vena Health",
+    "slug": "vena-health",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "vena",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#6B0F1A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vena.health"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#6B0F1A"
+      },
+      "package": "com.vena.health"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
