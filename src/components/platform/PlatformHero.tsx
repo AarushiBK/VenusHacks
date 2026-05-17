@@ -37,16 +37,16 @@ function CtaButtons() {
   return (
     <div className="flex flex-col gap-2.5">
       <Link
-        href="/carechain"
+        href="/motherboard"
         className="rounded-2xl bg-rose-deep px-5 py-3.5 text-center text-sm font-semibold text-white shadow-md shadow-rose-deep/20 transition hover:bg-rose-deep/90"
       >
-        See the demo →
+        Cardiovascular passport →
       </Link>
       <Link
-        href="/motherboard"
+        href="/metrics"
         className="rounded-2xl border border-sage/40 bg-sage-light px-5 py-3.5 text-center text-sm font-semibold text-sage transition hover:bg-sage-light/80"
       >
-        Cardiovascular passport
+        Face scan & metrics
       </Link>
     </div>
   );

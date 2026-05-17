@@ -6,7 +6,6 @@ import { useState } from "react";
 
 export type NavActive =
   | "platform"
-  | "carechain"
   | "motherboard"
   | "symptoms"
   | "health"
@@ -20,22 +19,6 @@ type SideTab = {
 };
 
 const SIDE_TABS: SideTab[] = [
-  {
-    id: "carechain",
-    href: "/carechain",
-    label: "Carechain",
-    icon: (active) => (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
-        <path
-          d="M3 12h3.5l2-5 3 10 2.5-6 1.8 3.5H21"
-          stroke="currentColor"
-          strokeWidth={active ? 2 : 1.6}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
-  },
   {
     id: "motherboard",
     href: "/motherboard",
@@ -213,12 +196,12 @@ function HomeNavTab({ isActive }: { isActive: boolean }) {
 
 export function BottomNav({ active }: { active: NavActive }) {
   const left = SIDE_TABS.slice(0, 2);
-  const right = SIDE_TABS.slice(2, 5);
+  const right = SIDE_TABS.slice(2);
 
   return (
     <nav
       aria-label="Main navigation"
-      className="phone-fixed-layer fixed bottom-0 z-40 border-t border-blush/60 bg-white/95 backdrop-blur-md"
+      className="phone-bottom-nav z-50 shrink-0 border-t border-blush/60 bg-white/95 backdrop-blur-md"
     >
       <div className="flex w-full items-end justify-between gap-1 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))]">
         {left.map((tab) => (

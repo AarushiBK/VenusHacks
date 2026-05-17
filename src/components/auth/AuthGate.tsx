@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { PhoneAppShell } from "@/components/layout/PhoneAppShell";
 import { useAuth } from "@/context/AuthContext";
 import { isAuthenticated } from "@/lib/authSession";
 const PUBLIC_PATHS = ["/welcome", "/login", "/signup"];
@@ -38,9 +39,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (firebaseEnabled && loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-cream">
-        <p className="text-muted text-sm">Loading…</p>
-      </div>
+      <PhoneAppShell>
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-cream px-6">
+          <p className="text-muted text-sm">Loading…</p>
+        </div>
+      </PhoneAppShell>
     );
   }
 

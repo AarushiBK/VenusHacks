@@ -5,7 +5,6 @@ export type { NavActive };
 
 const PAGE_TITLES: Record<NavActive, string> = {
   platform: "Home",
-  carechain: "CARECHAIN",
   motherboard: "Motherboard",
   symptoms: "Symptoms",
   health: "Health",
@@ -27,8 +26,8 @@ export function PageShell({
   wide?: boolean;
 }) {
   return (
-    <>
-      <main className="min-h-dvh w-full pb-32">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
         {showHeader && (
           <header className="sticky top-0 z-30 flex items-center justify-between border-b border-blush/50 bg-cream/85 px-5 pb-3 pt-1 backdrop-blur-md">
             <p className="text-rose-deep text-[11px] font-bold tracking-[0.18em] uppercase">
@@ -39,9 +38,9 @@ export function PageShell({
             </p>
           </header>
         )}
-        <div className={flush ? "p-0" : "px-4 pt-2"}>{children}</div>
+        <div className={flush ? "p-0" : "px-4 pt-2 pb-4"}>{children}</div>
       </main>
       <BottomNav active={active} />
-    </>
+    </div>
   );
 }

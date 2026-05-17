@@ -67,7 +67,7 @@ export function FaceScannerMetrics() {
           }}
           allow="camera *; microphone *; autoplay"
         />
-        <div className="bg-cream border-t border-blush/40 pt-3 pb-28">
+        <div className="bg-cream border-t border-blush/40 pt-3 pb-4">
           <WeekForecast days={forecast} />
         </div>
       </div>

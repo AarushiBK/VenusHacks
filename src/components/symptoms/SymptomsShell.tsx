@@ -9,7 +9,7 @@ export function SymptomsShell({ children }: { children: React.ReactNode }) {
 
   if (inJourney) {
     return (
-      <div className="flex min-h-dvh w-full flex-col overflow-hidden bg-cream">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-cream">
         {children}
       </div>
     );

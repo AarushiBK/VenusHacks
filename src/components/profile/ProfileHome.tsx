@@ -10,11 +10,7 @@ import {
 import { getAvgMetrics } from "@/lib/profile";
 import { isMetricId, type MetricId } from "@/lib/metricHistory";
 import { useAuth } from "@/context/AuthContext";
-import {
-  activateMayaDemoSession,
-  isMayaDemoEmail,
-  isMayaUser,
-} from "@/lib/demo/mayaDemo";
+import { activateMayaDemoSession, isMayaUser } from "@/lib/demo/mayaDemo";
 import { loadAccountEmail } from "@/lib/profileStorage";
 import { seedDemoSymptomLogsIfEmpty } from "@/lib/symptomLogsStorage";
 import { mockPatient } from "@/lib/vitals";

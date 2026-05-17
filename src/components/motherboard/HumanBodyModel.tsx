@@ -1,9 +1,12 @@
 "use client";
 
-import { Center, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { computeScanAnchorPositions } from "@/lib/bodyScanAnchors";
+import {
+  computeScanAnchorPositions,
+  prepareBodyMesh,
+} from "@/lib/bodyScanAnchors";
 import { PASSPORT_SCANS } from "@/lib/passportScans";
 import { ScanHotspots } from "./ScanHotspots";
 
@@ -35,6 +38,9 @@ function applySolidBodyMaterials(object: THREE.Object3D) {
   });
 }
 
+/** Nudge down so the figure sits visually centered in the passport frame */
+const BODY_Y_OFFSET = -0.4;
+
 export function HumanBodyModel({
   selectedScanId,
   onSelectScan,
@@ -48,31 +54,20 @@ export function HumanBodyModel({
   const { model, anchors } = useMemo(() => {
     const clone = scene.clone(true);
     applySolidBodyMaterials(clone);
-
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = maxDim > 0 ? 1.65 / maxDim : 1;
-    clone.scale.setScalar(scale);
-
-    const anchorMap = computeScanAnchorPositions(clone, PASSPORT_SCANS);
-
-    return { model: clone, anchors: anchorMap };
+    const prepared = prepareBodyMesh(clone);
+    const anchorMap = computeScanAnchorPositions(prepared, PASSPORT_SCANS);
+    return { model: prepared, anchors: anchorMap };
   }, [scene]);
 
   return (
-    <group ref={groupRef}>
-      <Center>
-        <group>
-          <primitive object={model} />
-          <ScanHotspots
-            scans={PASSPORT_SCANS}
-            anchors={anchors}
-            selectedId={selectedScanId}
-            onSelect={onSelectScan}
-          />
-        </group>
-      </Center>
+    <group ref={groupRef} position={[0, BODY_Y_OFFSET, 0]}>
+      <primitive object={model} />
+      <ScanHotspots
+        scans={PASSPORT_SCANS}
+        anchors={anchors}
+        selectedId={selectedScanId}
+        onSelect={onSelectScan}
+      />
     </group>
   );
 }

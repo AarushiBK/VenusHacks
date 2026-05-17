@@ -91,7 +91,7 @@ export function SettingsPanel({
 
   return (
     <div
-      className="phone-fixed-layer fixed inset-0 z-50 flex justify-end"
+      className="phone-overlay-root flex justify-end"
       role="dialog"
       aria-modal
       aria-labelledby="settings-title"
@@ -102,7 +102,7 @@ export function SettingsPanel({
         onClick={onClose}
         aria-label="Close settings"
       />
-      <aside className="relative flex h-full w-full max-w-full flex-col bg-cream shadow-2xl">
+      <aside className="relative flex h-full w-full flex-col bg-cream shadow-2xl">
         <div className="flex items-center justify-between border-b border-blush/60 px-5 py-4">
           <h2 id="settings-title" className="font-display text-ink text-lg font-semibold">
             Settings

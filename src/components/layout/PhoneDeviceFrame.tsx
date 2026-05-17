@@ -22,12 +22,12 @@ export function PhoneDeviceFrame({
   const variantClass = VARIANT_CLASS[variant];
 
   return (
-    <div className={`phone-app-device phone-device-frame ${variantClass}`.trim()}>
+    <div className={`phone-app-device phone-device-frame flex flex-col ${variantClass}`.trim()}>
       <div className="phone-status-region" aria-hidden>
         <span className="phone-dynamic-island" />
       </div>
       {overlay}
-      <div className="phone-device-content">{children}</div>
+      <div className="phone-device-content flex min-h-0 flex-1 flex-col">{children}</div>
       <div className="phone-home-indicator-wrap" aria-hidden>
         <span className="phone-home-indicator" />
       </div>

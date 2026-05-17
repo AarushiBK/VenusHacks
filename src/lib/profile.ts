@@ -68,23 +68,6 @@ export const ACCOUNT_SETTINGS = {
   email: DEFAULT_ACCOUNT_EMAIL,
 };
 
-export interface ReportOption {
-  id: string;
-  label: string;
-  group: "data" | "symptoms";
-}
-
-export const REPORT_OPTIONS: ReportOption[] = [
-  { id: "bp", label: "Blood pressure readings", group: "data" },
-  { id: "hr", label: "Heart rate & HRV", group: "data" },
-  { id: "spo2", label: "Blood oxygen", group: "data" },
-  { id: "weight", label: "Weight trend", group: "data" },
-  { id: "headache", label: "Headache", group: "symptoms" },
-  { id: "swelling", label: "Swelling", group: "symptoms" },
-  { id: "vision", label: "Vision changes", group: "symptoms" },
-  { id: "fatigue", label: "Fatigue", group: "symptoms" },
-];
-
 export function getProfileHealthSummary(): string[] {
   const snapshot = metricsSnapshot;
   return [

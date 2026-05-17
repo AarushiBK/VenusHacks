@@ -27,7 +27,7 @@ function SceneContent({
       />
 
       <OrbitControls
-        target={[0, 0, 0]}
+        target={[0, -0.3, 0]}
         enablePan={false}
         enableZoom
         minDistance={1.6}
@@ -52,7 +52,7 @@ export function HumanBodyScene({
   return (
     <div className="relative h-[min(72vw,460px)] min-h-[400px] w-full touch-none">
       <Canvas
-        camera={{ position: [0, 0.05, 2.9], fov: 40 }}
+        camera={{ position: [0, -0.2, 2.9], fov: 40 }}
         gl={{ antialias: true, alpha: false }}
         dpr={[1, 2]}
       >

@@ -8,11 +8,8 @@ export interface PassportScan {
   bodyPart: string;
   imageSrc: string;
   region: BodyRegion;
-  /**
-   * Ray origin (x, y) used to snap onto the body surface from the front.
-   * Patient right ovary = negative x on the model facing the camera.
-   */
-  probe: [number, number];
+  /** Optional fine-tune for dot placement (fraction of body width / height). */
+  probeOffset?: [number, number];
   dateStart: string;
   dateEnd?: string;
   dateLabel: string;
@@ -29,7 +26,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Uterus & ovaries",
     imageSrc: "/passport/scans/normal-pelvic-ultrasound.png",
     region: "pelvis",
-    probe: [0, -0.3],
     dateStart: "2023-01-12",
     dateLabel: "Jan 2023",
     phase: "Gynecology",
@@ -43,7 +39,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Uterus",
     imageSrc: "/passport/scans/healthy-uterus-ovaries.png",
     region: "pelvis",
-    probe: [0.02, -0.35],
     dateStart: "2023-04-08",
     dateLabel: "Apr 2023",
     phase: "Gynecology",
@@ -57,7 +52,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Right ovary",
     imageSrc: "/passport/scans/pcos-ovary-ultrasound.png",
     region: "right_ovary",
-    probe: [-0.11, -0.36],
     dateStart: "2023-11-02",
     dateEnd: "2023-11-02",
     dateLabel: "Nov 2023",
@@ -72,7 +66,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Right ovary",
     imageSrc: "/passport/scans/pcos-explained.png",
     region: "right_ovary",
-    probe: [-0.09, -0.4],
     dateStart: "2023-11-15",
     dateLabel: "Nov 2023",
     phase: "Gynecology",
@@ -86,7 +79,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Heart",
     imageSrc: "/passport/scans/normal-ecogram.png",
     region: "heart",
-    probe: [0, 0.2],
     dateStart: "2024-03-20",
     dateLabel: "Mar 2024",
     phase: "Cardiology",
@@ -100,7 +92,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Heart",
     imageSrc: "/passport/scans/heart-health-explained.png",
     region: "heart",
-    probe: [0.04, 0.17],
     dateStart: "2024-06-05",
     dateLabel: "Jun 2024",
     phase: "Cardiology",
@@ -114,7 +105,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Heart",
     imageSrc: "/passport/scans/abnormal-ecogram.png",
     region: "heart",
-    probe: [-0.04, 0.22],
     dateStart: "2024-08-18",
     dateLabel: "Aug 2024",
     phase: "Cardiology",
@@ -128,7 +118,6 @@ export const PASSPORT_SCANS: PassportScan[] = [
     bodyPart: "Heart",
     imageSrc: "/passport/scans/heart-disease-explained.png",
     region: "heart",
-    probe: [0, 0.26],
     dateStart: "2024-09-10",
     dateLabel: "Sep 2024",
     phase: "Cardiology",
