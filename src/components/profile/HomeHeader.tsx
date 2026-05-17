@@ -1,6 +1,7 @@
 "use client";
 
 import { PageGreeting } from "@/components/layout/PageGreeting";
+import { getDisplayName } from "@/lib/authSession";
 import type { PatientContext } from "@/types/vitals";
 
 export function HomeHeader({
@@ -12,7 +13,7 @@ export function HomeHeader({
 }) {
   return (
     <PageGreeting
-      name={patient.name}
+      name={getDisplayName()}
       detail={patient.detail}
       onOpenSettings={onOpenSettings}
     />

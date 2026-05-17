@@ -6,7 +6,7 @@ import {
   getHealthMetricsOverview,
 } from "@/lib/healthOverview";
 import { isMetricId, type MetricId } from "@/lib/metricHistory";
-import { mockPatient } from "@/lib/vitals";
+import { getDisplayName } from "@/lib/authSession";
 import { MetricDetailView } from "@/components/profile/MetricDetailView";
 import { DailyRecommendations } from "./DailyRecommendations";
 import { HealthMetricRow } from "./HealthMetricRow";
@@ -29,7 +29,7 @@ export function HealthOverviewScreen() {
 
   return (
     <>
-      <PageGreeting name={mockPatient.name} />
+      <PageGreeting name={getDisplayName()} />
 
       <section aria-labelledby="overall-health-heading">
         <WireframeSectionTitle id="overall-health-heading">

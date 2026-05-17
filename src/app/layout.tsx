@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
-import { PhoneAppShell } from "@/components/layout/PhoneAppShell";
+import { AppRoot } from "@/components/layout/AppRoot";
 import { BRAND } from "@/lib/carechain";
 import "./globals.css";
 
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${fraunces.variable} antialiased`}>
-        <PhoneAppShell>{children}</PhoneAppShell>
+        <AppRoot>{children}</AppRoot>
       </body>
     </html>
   );

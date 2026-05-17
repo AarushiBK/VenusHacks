@@ -215,6 +215,34 @@ body {
   transform: scale(1.16);
 }
 
+/* Auth welcome — from Log-in branch */
+.welcome-sky-gradient {
+  background: linear-gradient(
+    180deg,
+    #7b2d4e 0%,
+    color-mix(in srgb, #7b2d4e 94%, #faf7f4) 14%,
+    color-mix(in srgb, #7b2d4e 82%, #faf7f4) 26%,
+    color-mix(in srgb, #7b2d4e 68%, #faf7f4) 38%,
+    color-mix(in srgb, #7b2d4e 52%, #faf7f4) 50%,
+    color-mix(in srgb, #7b2d4e 36%, #faf7f4) 62%,
+    color-mix(in srgb, #7b2d4e 22%, #faf7f4) 74%,
+    color-mix(in srgb, #7b2d4e 10%, #faf7f4) 86%,
+    #faf7f4 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 78%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
+}
+
+.welcome-sky-gradient-panel {
+  top: 0;
+  height: min(68%, 28rem);
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

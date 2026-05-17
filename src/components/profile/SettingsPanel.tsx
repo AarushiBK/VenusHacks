@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { clearAuthenticated } from "@/lib/authSession";
 import { BRAND } from "@/lib/carechain";
 import {
   loadAccountEmail,
@@ -49,6 +51,7 @@ export function SettingsPanel({
   open: boolean;
   onClose: () => void;
 }) {
+  const router = useRouter();
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [contacts, setContacts] = useState<EmergencyContactsState>(() =>
     loadEmergencyContacts(),
@@ -174,6 +177,20 @@ export function SettingsPanel({
                 <ChangePasswordForm onDone={() => setChangingPassword(false)} />
               )}
             </div>
+          </section>
+
+          <section className="border-t border-blush/60 py-5">
+            <button
+              type="button"
+              onClick={() => {
+                clearAuthenticated();
+                onClose();
+                router.replace("/welcome");
+              }}
+              className="text-alert w-full rounded-xl border border-alert/30 bg-alert-bg py-3 text-sm font-semibold"
+            >
+              Sign out
+            </button>
           </section>
         </div>
       </aside>
