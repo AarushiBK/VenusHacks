@@ -31,11 +31,11 @@ export function JourneyHeader({
   ink = "#2a1f24",
 }: JourneyHeaderProps) {
   return (
-    <header className="relative z-10 flex items-center justify-between px-4 pt-3 safe-top">
+    <header className="relative z-10 flex items-center justify-between px-4 pb-1 pt-1">
       {backTo ? (
         <Link
           to={backTo}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/60 shadow-sm backdrop-blur-sm transition active:bg-white/80"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/25 shadow-sm backdrop-blur-sm transition active:bg-white/40"
           style={{ color: ink }}
           aria-label="Back"
         >
@@ -53,7 +53,7 @@ export function JourneyHeader({
       )}
       <Link
         to={closeTo}
-        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/60 text-sm font-medium shadow-sm backdrop-blur-sm transition active:bg-white/80"
+        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/25 text-sm font-medium shadow-sm backdrop-blur-sm transition active:bg-white/40"
         style={{ color: ink }}
         aria-label="Close"
       >

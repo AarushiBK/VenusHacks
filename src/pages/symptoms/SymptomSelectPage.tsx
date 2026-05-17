@@ -49,7 +49,8 @@ export function SymptomSelectPage() {
 
   return (
     <section
-      className={`flex min-h-full flex-col transition-colors duration-500 ${theme.bgClass}`}
+      className="symptom-journey-screen symptom-journey-bg-smooth flex flex-col"
+      style={{ background: theme.background }}
     >
       <JourneyHeader
         backTo="/symptoms/log/mood"
@@ -132,7 +133,8 @@ export function SymptomSelectPage() {
           type="button"
           disabled={!hasSelection || saving}
           onClick={handleSave}
-          className={`shrink-0 w-full rounded-full py-4 text-base font-semibold shadow-md disabled:opacity-40 active:opacity-90 ${theme.buttonClass}`}
+          className="mood-accent-smooth shrink-0 w-full rounded-full py-4 text-base font-semibold text-white shadow-md disabled:opacity-40 active:opacity-90"
+          style={{ backgroundColor: theme.accent }}
         >
           {saving ? "Saving…" : "Next"}
         </button>

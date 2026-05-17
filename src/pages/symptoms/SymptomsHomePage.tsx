@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   ShowInChartsLink,
   SymptomSummaryCard,
@@ -19,13 +20,34 @@ function partitionLogs(entries: SymptomLogEntry[]) {
 }
 
 export function SymptomsHomePage() {
+  const location = useLocation();
+  const fromLogged = Boolean(
+    (location.state as { fromLogged?: boolean } | null)?.fromLogged,
+  );
+  const [visible, setVisible] = useState(!fromLogged);
+
+  useEffect(() => {
+    if (!fromLogged) return;
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setVisible(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [fromLogged]);
+
+  const enterClass = [
+    fromLogged ? "symptoms-home-enter" : "",
+    visible ? "is-visible" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const today = getTodayIsoDate();
   const todayLogs = getLogsForDay(today);
   const { daily, moments } = partitionLogs(todayLogs);
 
   return (
-    <div className="flex min-h-full flex-col bg-cream pb-6">
-      <header className="sticky top-0 z-20 border-b border-border/50 bg-cream/95 px-4 py-3 backdrop-blur-sm safe-top">
+    <div className={`flex min-h-full flex-col bg-cream pb-6 ${enterClass}`}>
+      <header className="sticky top-0 z-20 bg-transparent px-4 py-3 safe-top">
         <div className="flex items-center justify-center">
           <h1 className="font-display text-2xl font-bold text-ink">Symptoms</h1>
         </div>

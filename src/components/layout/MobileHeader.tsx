@@ -12,7 +12,7 @@ export function MobileHeader({
   backLabel = "Back",
 }: MobileHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border/60 bg-cream/95 px-4 py-3 backdrop-blur-sm safe-top">
+    <header className="sticky top-0 z-20 flex items-center gap-3 bg-transparent px-4 py-3 safe-top">
       <Link
         to={backTo}
         className="flex size-10 shrink-0 items-center justify-center rounded-full text-burgundy transition active:bg-burgundy/10"

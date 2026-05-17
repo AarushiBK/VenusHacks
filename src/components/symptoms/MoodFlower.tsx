@@ -40,6 +40,7 @@ export function MoodFlower({ mood, size = "lg" }: MoodFlowerProps) {
           width: size === "lg" ? "28%" : size === "md" ? "32%" : "34%",
           height: size === "lg" ? "28%" : size === "md" ? "32%" : "34%",
           background: `radial-gradient(circle at 35% 30%, hsl(${theme.hue} 75% 72%), hsl(${theme.hue} 55% 48%))`,
+          transition: "background 0.55s cubic-bezier(0.22, 1, 0.36, 1)",
         }}
       />
     </div>

@@ -2,90 +2,146 @@ import { getMoodLabel } from "./moodLabels";
 
 export interface MoodTheme {
   label: string;
-  bgClass: string;
+  /** Interpolated gradient for smooth slider transitions */
+  background: string;
   accent: string;
   accentMuted: string;
-  buttonClass: string;
   ink: string;
   hue: number;
 }
 
-export function getMoodTheme(value: number): MoodTheme {
-  const label = getMoodLabel(value);
+type Rgb = [number, number, number];
 
-  if (value < 15) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-purple",
-      accent: "#5c4a8a",
-      accentMuted: "#8b7cb8",
-      buttonClass: "bg-[#4a3d72] text-white",
-      ink: "#2e2640",
-      hue: 270,
-    };
-  }
-  if (value < 32) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-blue",
-      accent: "#7a3046",
-      accentMuted: "#b87a88",
-      buttonClass: "bg-burgundy text-white",
-      ink: "#2a1f24",
-      hue: 340,
-    };
-  }
-  if (value < 48) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-slate",
-      accent: "#8f3d55",
-      accentMuted: "#c99aaa",
-      buttonClass: "bg-burgundy-dark text-white",
-      ink: "#2a1f24",
-      hue: 330,
-    };
-  }
-  if (value < 55) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-teal",
-      accent: "#4a8a8a",
-      accentMuted: "#7ab8b8",
-      buttonClass: "bg-[#3d7878] text-white",
-      ink: "#243030",
-      hue: 175,
-    };
-  }
-  if (value < 68) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-green",
-      accent: "#5a8a4a",
-      accentMuted: "#8ab87a",
-      buttonClass: "bg-[#4a7840] text-white",
-      ink: "#283020",
-      hue: 95,
-    };
-  }
-  if (value < 85) {
-    return {
-      label,
-      bgClass: "symptom-journey-bg-gold",
-      accent: "#b88a30",
-      accentMuted: "#d4b060",
-      buttonClass: "bg-[#c4922a] text-white",
-      ink: "#3d3018",
-      hue: 42,
-    };
-  }
+interface MoodStop {
+  at: number;
+  gradient: [string, string, string];
+  accent: string;
+  accentMuted: string;
+  ink: string;
+  hue: number;
+}
+
+/** Unpleasant → pleasant: violet → blue → teal → green → green-yellow → yellow → orange-red */
+const MOOD_STOPS: MoodStop[] = [
+  {
+    at: 0,
+    gradient: ["#e2dcf8", "#c4b8f0", "#9a88dc"],
+    accent: "#4c3c9e",
+    accentMuted: "#7a6cc4",
+    ink: "#241e3a",
+    hue: 262,
+  },
+  {
+    at: 17,
+    gradient: ["#e6eef8", "#c8dcf4", "#aac8ec"],
+    accent: "#3a6a9e",
+    accentMuted: "#6894c0",
+    ink: "#1e2a38",
+    hue: 215,
+  },
+  {
+    at: 33,
+    gradient: ["#e4f4f4", "#c8eae8", "#acdedc"],
+    accent: "#2a8a80",
+    accentMuted: "#58b4ac",
+    ink: "#1e3230",
+    hue: 175,
+  },
+  {
+    at: 50,
+    gradient: ["#ecf6e8", "#d4ecc8", "#bce0a8"],
+    accent: "#4a8838",
+    accentMuted: "#78b064",
+    ink: "#243020",
+    hue: 115,
+  },
+  {
+    at: 67,
+    gradient: ["#f2f6dc", "#e6eeb8", "#d8e894"],
+    accent: "#88a828",
+    accentMuted: "#b4cc54",
+    ink: "#303018",
+    hue: 72,
+  },
+  {
+    at: 83,
+    gradient: ["#faf6dc", "#f4ecb0", "#ede088"],
+    accent: "#c49c1c",
+    accentMuted: "#e0c050",
+    ink: "#383018",
+    hue: 48,
+  },
+  {
+    at: 100,
+    gradient: ["#fce8dc", "#f8ccb0", "#f4a888"],
+    accent: "#d85020",
+    accentMuted: "#e88050",
+    ink: "#3a1c10",
+    hue: 18,
+  },
+];
+
+function clampMood(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+function hexToRgb(hex: string): Rgb {
+  const h = hex.replace("#", "");
+  return [
+    parseInt(h.slice(0, 2), 16),
+    parseInt(h.slice(2, 4), 16),
+    parseInt(h.slice(4, 6), 16),
+  ];
+}
+
+function rgbToHex([r, g, b]: Rgb): string {
+  return `#${[r, g, b]
+    .map((c) => Math.round(c).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function lerpHex(a: string, b: string, t: number): string {
+  const [ar, ag, ab] = hexToRgb(a);
+  const [br, bg, bb] = hexToRgb(b);
+  return rgbToHex([ar + (br - ar) * t, ag + (bg - ag) * t, ab + (bb - ab) * t]);
+}
+
+function lerpHue(a: number, b: number, t: number): number {
+  let delta = b - a;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  let h = a + delta * t;
+  if (h < 0) h += 360;
+  if (h >= 360) h -= 360;
+  return h;
+}
+
+function interpolateStops(value: number) {
+  const mood = clampMood(value);
+  let i = 0;
+  while (i < MOOD_STOPS.length - 1 && mood > MOOD_STOPS[i + 1].at) i += 1;
+
+  const start = MOOD_STOPS[i];
+  const end = MOOD_STOPS[Math.min(i + 1, MOOD_STOPS.length - 1)];
+  const span = end.at - start.at;
+  const t = span === 0 ? 0 : (mood - start.at) / span;
+
+  const [top, mid, bottom] = start.gradient.map((color, idx) =>
+    lerpHex(color, end.gradient[idx], t),
+  ) as [string, string, string];
+
   return {
-    label,
-    bgClass: "symptom-journey-bg-peach",
-    accent: "#d47840",
-    accentMuted: "#e8a070",
-    buttonClass: "bg-[#e07030] text-white",
-    ink: "#402818",
-    hue: 24,
+    background: `linear-gradient(180deg, ${top} 0%, ${mid} 50%, ${bottom} 100%)`,
+    accent: lerpHex(start.accent, end.accent, t),
+    accentMuted: lerpHex(start.accentMuted, end.accentMuted, t),
+    ink: lerpHex(start.ink, end.ink, t),
+    hue: lerpHue(start.hue, end.hue, t),
+  };
+}
+
+export function getMoodTheme(value: number): MoodTheme {
+  return {
+    label: getMoodLabel(value),
+    ...interpolateStops(value),
   };
 }

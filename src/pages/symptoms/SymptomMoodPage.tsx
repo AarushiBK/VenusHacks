@@ -16,7 +16,8 @@ export function SymptomMoodPage() {
 
   return (
     <section
-      className={`flex min-h-full flex-col transition-colors duration-500 ${theme.bgClass}`}
+      className="symptom-journey-screen symptom-journey-bg-smooth flex flex-col"
+      style={{ background: theme.background }}
     >
       <JourneyHeader
         title="Symptoms"
@@ -24,9 +25,9 @@ export function SymptomMoodPage() {
         closeTo="/symptoms"
         ink={theme.ink}
       />
-      <div className="flex flex-1 flex-col px-5 pb-8 pt-4">
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-8 pt-4">
         <h1
-          className="text-center font-display text-xl font-bold leading-snug"
+          className="mood-accent-smooth text-center font-display text-xl font-bold leading-snug"
           style={{ color: theme.ink }}
         >
           {prompt}
@@ -35,7 +36,7 @@ export function SymptomMoodPage() {
         <div className="my-6 flex flex-1 flex-col items-center justify-center">
           <MoodFlower mood={draft.mood} />
           <p
-            className="mt-6 font-display text-2xl font-bold"
+            className="mood-accent-smooth mt-6 font-display text-2xl font-bold"
             style={{ color: theme.ink }}
           >
             {theme.label}
@@ -49,12 +50,12 @@ export function SymptomMoodPage() {
             max={100}
             value={draft.mood}
             onChange={(e) => setMood(Number(e.target.value))}
-            className="apple-mood-slider w-full"
+            className="mood-accent-smooth apple-mood-slider w-full"
             aria-label="How pleasant or unpleasant you feel"
             style={{ accentColor: theme.accent }}
           />
           <div
-            className="flex justify-between text-[10px] font-semibold uppercase tracking-wide"
+            className="mood-accent-smooth flex justify-between text-[10px] font-semibold uppercase tracking-wide"
             style={{ color: theme.ink, opacity: 0.55 }}
           >
             <span>Very unpleasant</span>
@@ -65,7 +66,8 @@ export function SymptomMoodPage() {
         <button
           type="button"
           onClick={() => navigate("/symptoms/log/select")}
-          className={`mt-8 w-full rounded-full py-4 text-base font-semibold shadow-md active:opacity-90 ${theme.buttonClass}`}
+          className="mood-accent-smooth mt-8 w-full rounded-full py-4 text-base font-semibold text-white shadow-md active:opacity-90"
+          style={{ backgroundColor: theme.accent }}
         >
           Next
         </button>

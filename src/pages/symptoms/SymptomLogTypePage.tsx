@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { DecorativeBlooms } from "../../components/symptoms/DecorativeBlooms";
 import { JourneyHeader } from "../../components/symptoms/JourneyHeader";
 import { useSymptomLogDraft } from "../../context/SymptomLogDraftContext";
 
@@ -12,12 +11,11 @@ export function SymptomLogTypePage() {
   const { draft, setKind } = useSymptomLogDraft();
 
   return (
-    <section className="symptom-journey-bg-intro flex min-h-full flex-col">
+    <section className="symptom-journey-screen symptom-journey-bg-intro flex flex-col">
       <JourneyHeader closeTo="/symptoms" ink="#2a1f24" />
-      <div className="flex flex-1 flex-col px-5 pb-8 pt-2">
-        <DecorativeBlooms />
-        <h1 className="text-center font-display text-2xl font-bold text-ink">
-          Log a symptom check-in
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-8 pt-2">
+        <h1 className="mt-4 text-center font-display text-2xl font-bold text-ink">
+          Log your symptoms
         </h1>
 
         <div className="mt-8 space-y-3">

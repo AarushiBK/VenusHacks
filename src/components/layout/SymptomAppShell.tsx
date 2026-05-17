@@ -12,7 +12,9 @@ export function SymptomAppShell({ children }: SymptomAppShellProps) {
   const inJourney = pathname.includes("/symptoms/log");
 
   return (
-    <MobileShell className="overflow-hidden">
+    <MobileShell
+      className={inJourney ? "overflow-hidden !bg-transparent" : "overflow-hidden"}
+    >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div
           className={[
@@ -22,7 +24,7 @@ export function SymptomAppShell({ children }: SymptomAppShellProps) {
         >
           {children}
         </div>
-        {!inJourney && <BottomNav />}
+        <BottomNav />
       </div>
     </MobileShell>
   );
