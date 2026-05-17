@@ -7,6 +7,7 @@ const PAGE_TITLES: Record<NavActive, string> = {
   platform: "Home",
   carechain: "CARECHAIN",
   motherboard: "Motherboard",
+  symptoms: "Symptoms",
   health: "Health",
   metrics: "Metrics",
 };

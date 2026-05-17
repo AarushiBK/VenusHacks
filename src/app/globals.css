@@ -260,3 +260,156 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Symptoms tab — mood journey & log confirmation */
+@keyframes mood-orb-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.9;
+  }
+}
+
+.mood-orb-ring {
+  background: radial-gradient(
+    circle,
+    hsl(var(--mood-hue, 24) 70% 68% / 0.45) 0%,
+    hsl(var(--mood-hue, 24) 55% 55% / 0.12) 70%,
+    transparent 100%
+  );
+  animation: mood-orb-pulse 6s ease-in-out infinite;
+}
+
+.symptom-journey-screen {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0%;
+  min-height: 0;
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+
+.symptom-journey-bg-intro {
+  background: linear-gradient(180deg, #f5e8ec 0%, #ecdce4 45%, #e8d4d0 100%);
+}
+
+.symptom-journey-bg-smooth {
+  transition:
+    background 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.symptom-journey-bg-smooth .mood-accent-smooth {
+  transition:
+    color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    accent-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.symptom-card-gradient-empty {
+  background: linear-gradient(180deg, #f0f8f4 0%, #faf8f6 70%);
+}
+
+.symptom-card-gradient-filled {
+  background: linear-gradient(180deg, #faf4ec 0%, #fff 60%);
+}
+
+.mood-flower-petal {
+  background: radial-gradient(
+    ellipse at center,
+    hsl(var(--petal-hue, 24) 65% 70% / 0.55) 0%,
+    hsl(var(--petal-hue, 24) 50% 55% / 0.2) 70%,
+    transparent 100%
+  );
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  transition: background 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.apple-mood-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.45);
+}
+
+.apple-mood-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.18);
+}
+
+.apple-mood-slider::-moz-range-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.18);
+}
+
+.logged-confirmation {
+  opacity: 0;
+  transform: scale(0.94) translateY(10px);
+  transition:
+    opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.logged-confirmation.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.logged-confirmation.is-exiting {
+  opacity: 0;
+  transform: scale(0.98) translateY(-6px);
+  transition:
+    opacity 0.4s cubic-bezier(0.4, 0, 0.8, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.8, 1);
+}
+
+.logged-confirmation-glow {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.logged-confirmation.is-visible .logged-confirmation-glow {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.symptoms-home-enter {
+  opacity: 0;
+  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.symptoms-home-enter.is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logged-confirmation,
+  .logged-confirmation-glow,
+  .symptoms-home-enter {
+    transition: none;
+  }
+
+  .logged-confirmation {
+    opacity: 1;
+    transform: none;
+  }
+
+  .logged-confirmation-glow {
+    opacity: 1;
+  }
+}

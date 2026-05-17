@@ -8,6 +8,7 @@ export type NavActive =
   | "platform"
   | "carechain"
   | "motherboard"
+  | "symptoms"
   | "health"
   | "metrics";
 
@@ -54,6 +55,27 @@ const SIDE_TABS: SideTab[] = [
           d="M8 8h8M8 12h8M8 16h5"
           stroke="currentColor"
           strokeWidth={1.5}
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "symptoms",
+    href: "/symptoms",
+    label: "Symptoms",
+    icon: (active) => (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+        <path
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+          stroke="currentColor"
+          strokeWidth={active ? 2 : 1.6}
+          strokeLinecap="round"
+        />
+        <path
+          d="M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4"
+          stroke="currentColor"
+          strokeWidth={active ? 2 : 1.6}
           strokeLinecap="round"
         />
       </svg>
@@ -191,7 +213,7 @@ function HomeNavTab({ isActive }: { isActive: boolean }) {
 
 export function BottomNav({ active }: { active: NavActive }) {
   const left = SIDE_TABS.slice(0, 2);
-  const right = SIDE_TABS.slice(2);
+  const right = SIDE_TABS.slice(2, 5);
 
   return (
     <nav
