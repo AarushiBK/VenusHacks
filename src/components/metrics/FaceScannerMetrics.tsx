@@ -8,11 +8,8 @@ export function FaceScannerMetrics() {
       <iframe
         src="/scanner/index.html?embed=1"
         title="Face scan and vitals metrics"
-        className="block w-full border-0"
-        style={{
-          minHeight: "calc(100dvh - 5.75rem)",
-          background: "#7a304d",
-        }}
+        className="block min-h-[calc(100dvh-5rem)] w-full border-0"
+        style={{ background: "#7a304d" }}
         allow="camera; microphone"
       />
     </PageShell>

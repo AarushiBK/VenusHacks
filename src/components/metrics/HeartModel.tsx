@@ -20,7 +20,7 @@ class HeartModelErrorBoundary extends Component<
   }
 }
 
-/** Sloyd GLB when public/models/heart.glb exists; otherwise procedural fallback. */
+/** GLB at public/models/heart_model.glb when present; otherwise procedural fallback. */
 export function HeartModel() {
   return (
     <HeartModelErrorBoundary fallback={<ProceduralHeartModel />}>

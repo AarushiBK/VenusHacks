@@ -1,10 +1,9 @@
-# Sloyd heart model
+# Heart 3D model
 
-Use your Sloyd export: https://app.sloyd.ai/output/qqhovtvv
+The Metrics tab loads **`heart_model.glb`** from this folder.
 
-1. Open the link while signed in to Sloyd.
-2. Click **Export** (or download) and choose **GLB**.
-3. Save the file as `heart.glb` in this folder (`public/models/heart.glb`).
-4. Restart the dev server and open **Metrics** — the app loads this model automatically.
+1. Export or download your model as GLB.
+2. Save it as `public/models/heart_model.glb`.
+3. Restart the dev server and open **Metrics** — scroll below the face scanner to interact with the model (drag to rotate, pinch to zoom).
 
-Until `heart.glb` is present, Metrics uses the built-in procedural heart.
+Until `heart_model.glb` is present, Metrics uses the built-in procedural heart.

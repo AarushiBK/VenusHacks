@@ -10,10 +10,10 @@ function SceneContent() {
     <>
       <color attach="background" args={["#141418"]} />
 
-      <ambientLight intensity={0.65} />
+      <ambientLight intensity={0.72} />
       <directionalLight
         position={[4, 6, 5]}
-        intensity={1.8}
+        intensity={1.65}
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
@@ -45,7 +45,9 @@ function SceneContent() {
       <OrbitControls
         target={[0, 0, 0]}
         enablePan={false}
-        enableZoom={false}
+        enableZoom
+        minDistance={1.4}
+        maxDistance={4.5}
         rotateSpeed={0.85}
         enableDamping
         dampingFactor={0.08}
@@ -63,7 +65,7 @@ export function HeartScene() {
       <Canvas
         shadows
         camera={{ position: [0, 0.05, 2.75], fov: 42 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{ antialias: true, alpha: false, localClippingEnabled: true }}
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
@@ -71,7 +73,7 @@ export function HeartScene() {
         </Suspense>
       </Canvas>
       <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[11px] text-white/50">
-        Drag to rotate
+        Drag to rotate · pinch to zoom
       </p>
     </div>
   );

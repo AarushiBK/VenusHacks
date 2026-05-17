@@ -4,31 +4,40 @@ import { Center, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import {
+  clipPeripheralHeartGeometry,
+  keepLargestMeshOnly,
+} from "./heartMeshCleanup";
+import {
+  applyHeartMaterialLook,
+  createHeartPhysicalMaterial,
+} from "./heartMaterial";
 
-/** Place exported Sloyd GLB at public/models/heart.glb */
-export const HEART_GLB_PATH = "/models/heart.glb";
+/** Anatomical heart GLB (place at public/models/heart_model.glb) */
+export const HEART_GLB_PATH = "/models/heart_model.glb";
 
 useGLTF.preload(HEART_GLB_PATH);
 
-function applyRoseGlassMaterial(object: THREE.Object3D) {
+function enhanceHeartMaterials(object: THREE.Object3D) {
   object.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-      child.material = new THREE.MeshPhysicalMaterial({
-        color: "#e8a8b0",
-        emissive: "#c97b84",
-        emissiveIntensity: 0.18,
-        roughness: 0.06,
-        metalness: 0.08,
-        transmission: 0.52,
-        thickness: 0.9,
-        ior: 1.45,
-        clearcoat: 1,
-        clearcoatRoughness: 0.06,
-        transparent: true,
-      });
-    }
+    if (!(child instanceof THREE.Mesh)) return;
+    child.castShadow = true;
+    child.receiveShadow = true;
+
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    const next = materials.map((mat) => {
+      const physical =
+        mat instanceof THREE.MeshPhysicalMaterial
+          ? mat.clone()
+          : mat instanceof THREE.MeshStandardMaterial
+            ? new THREE.MeshPhysicalMaterial().copy(mat as THREE.MeshStandardMaterial)
+            : createHeartPhysicalMaterial();
+
+      applyHeartMaterialLook(physical);
+      clipPeripheralHeartGeometry(physical);
+      return physical;
+    });
+    child.material = next.length === 1 ? next[0]! : next;
   });
 }
 
@@ -38,12 +47,13 @@ export function SloydHeartModel() {
 
   const model = useMemo(() => {
     const clone = scene.clone(true);
-    applyRoseGlassMaterial(clone);
+    keepLargestMeshOnly(clone);
+    enhanceHeartMaterials(clone);
 
     const box = new THREE.Box3().setFromObject(clone);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = maxDim > 0 ? 1.65 / maxDim : 1;
+    const scale = maxDim > 0 ? 1.85 / maxDim : 1;
     clone.scale.setScalar(scale);
 
     return clone;

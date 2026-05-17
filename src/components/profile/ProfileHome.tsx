@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { getAvgMetrics } from "@/lib/profile";
 import { isMetricId, type MetricId } from "@/lib/metricHistory";
 import { mockPatient } from "@/lib/vitals";
+import { HeartModelDisplay } from "@/components/metrics/HeartModelDisplay";
 import { AvgMetricGrid } from "./AvgMetricGrid";
 import { HomeHeader } from "./HomeHeader";
 import { MetricDetailView } from "./MetricDetailView";
@@ -46,6 +47,10 @@ export function ProfileHome() {
                 if (isMetricId(id)) setSelectedMetricId(id);
               }}
             />
+
+            <section aria-label="3D heart model" className="pb-2">
+              <HeartModelDisplay />
+            </section>
           </div>
         </>
       )}
