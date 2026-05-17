@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0e14" />
+  <title>Hemodynamic Bridge</title>
+  <link rel="stylesheet" href="/css/app.css?v=7" />
+</head>
+<body>
+  <header class="header">
+    <h1>Hemodynamic Bridge</h1>
+    <p class="tagline">Daily 30s pulse scan · open-rppg</p>
+    <p id="statusText" class="status">Loading…</p>
+  </header>
+
+  <section class="routine-panel">
+    <label class="field">
+      <span class="field-label">Your daily scan time</span>
+      <input type="time" id="routineTime" value="07:30" required />
+    </label>
+    <p id="routineHint" class="routine-hint">Routine: every day at <strong>7:30 AM</strong></p>
+
+    <label class="field">
+      <span class="field-label">Where are you in your journey?</span>
+      <select id="phaseSelect">
+        <option value="pre_pregnancy">Pre-pregnancy — building baseline</option>
+        <option value="pregnancy">Pregnancy — daily scans</option>
+        <option value="postpartum">Postpartum — recovery curve</option>
+      </select>
+    </label>
+
+    <button type="button" id="btnLockBaseline" class="btn-lock hidden">
+      Lock pre-pregnancy baseline from my scans
+    </button>
+  </section>
+
+  <div id="recoveryBadge" class="recovery-badge hidden" role="status">
+    <span id="recoveryLabel" class="recovery-label">—</span>
+    <span id="recoveryDetail" class="recovery-detail"></span>
+  </div>
+
+  <details class="guide-panel" open>
+    <summary>When to scan (read once)</summary>
+    <div class="guide-do">
+      <h3>Do — at your set time</h3>
+      <ul>
+        <li><strong>Same time daily</strong> (use the time above — e.g. <span id="guideTime">7:30 AM</span>)</li>
+        <li>Seated, feet down, <strong>face the light</strong> (window or lamp on forehead)</li>
+        <li>30 seconds <strong>still</strong>, phone at eye level, front camera</li>
+        <li>Before coffee and before exercise</li>
+        <li>After bathroom, when calm (1–2 min rest)</li>
+      </ul>
+    </div>
+    <div class="guide-dont">
+      <h3>Do not scan</h3>
+      <ul>
+        <li>Right after workout, stairs, or stress</li>
+        <li>Lying flat in bed or head at a steep angle</li>
+        <li>Dark room, backlight, or face turned away</li>
+        <li>While walking, talking, or eating</li>
+        <li>Within 30 min of caffeine or nicotine</li>
+      </ul>
+    </div>
+  </details>
+
+  <div id="recordBadge" class="record-badge hidden">
+    <span id="recordDot" class="dot"></span>
+    <span id="recordLabel">Scanning</span>
+    <span id="timerText" class="timer">0:00</span>
+  </div>
+
+  <main class="scanner">
+    <div id="videoWrap" class="video-wrap">
+      <div id="scanProgress" class="scan-progress"></div>
+      <div id="cameraPlaceholder" class="camera-placeholder">
+        <div class="face-ring static-ring"></div>
+        <p class="cta">Tap <strong>Start 30s scan</strong></p>
+        <p class="hint">Hold still · forehead in the circle</p>
+      </div>
+      <video id="video" playsinline webkit-playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div id="scanGuide" class="scan-guide hidden">
+        <div class="face-ring"></div>
+        <p>Forehead in the circle — hold still</p>
+      </div>
+    </div>
+
+    <div id="metricsRow" class="metrics">
+      <div class="metric"><span class="label">BPM</span><span id="valBpm" class="value">—</span></div>
+      <div class="metric"><span class="label">HRV</span><span id="valHrv" class="value">—</span><span class="unit">ms</span></div>
+      <div class="metric"><span class="label">Signal</span><span id="valConf" class="value">—</span></div>
+      <div class="metric"><span class="label">vs ref</span><span id="valDelta" class="value">—</span></div>
+    </div>
+
+    <p id="phaseText" class="phase">Ready</p>
+    <p id="qualityTip" class="quality-tip" hidden></p>
+
+    <div class="actions actions-single">
+      <button id="btnStart" type="button" class="btn-primary">Start 30s scan</button>
+      <button id="btnStop" type="button" class="btn-stop" disabled>Cancel</button>
+    </div>
+
+    <details class="dev-panel">
+      <summary>Developer output</summary>
+      <pre id="jsonPreview">{}</pre>
+    </details>
+  </main>
+
+  <footer class="footer">Wellness prototype · not a medical device</footer>
+
+  <script type="module" src="/js/scanner.js?v=7"></script>
+</body>
+</html>
