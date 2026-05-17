@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-family-display: var(--font-display);
+
+  --color-cream: #faf7f4;
+  --color-blush: #f3e8e4;
+  --color-rose: #c97b84;
+  --color-rose-deep: #9e4f5a;
+  --color-sage: #6b8f7a;
+  --color-sage-light: #e8f0eb;
+  --color-ink: #2a2428;
+  --color-muted: #6d6468;
+  --color-warning: #c4843a;
+  --color-warning-bg: #fdf4e8;
+  --color-alert: #b84a52;
+  --color-alert-bg: #fcecee;
+  --color-ok: #4a7c59;
+  --color-ok-bg: #edf5ef;
+
+  /* Clinical / infrastructure palette for CARECHAIN demo page */
+  --color-slate: #1a1f2e;
+  --color-slate-mid: #2c3347;
+  --color-slate-border: #3d4460;
+  --color-slate-muted: #8b92a8;
+  --color-grid: #e8eaed;
+  --color-carechain-glow: #c97b84;
+  --font-mono: "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", monospace;
+
+  --phone-width: 390px;
+  --phone-height: 844px;
+}
+
+body {
+  margin: 0;
+  background: #d4ccc8;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Centered phone-sized app frame */
+.phone-app-viewport {
+  display: flex;
+  min-height: 100dvh;
+  justify-content: center;
+  background: linear-gradient(165deg, #ddd5d1 0%, #c9c1bd 50%, #bfb7b3 100%);
+}
+
+.phone-app-device {
+  position: relative;
+  width: min(100vw, var(--phone-width));
+  max-width: var(--phone-width);
+  min-height: 100dvh;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: hidden;
+  background: var(--color-cream);
+}
+
+@media (min-width: 420px) {
+  .phone-app-viewport {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .phone-app-device {
+    width: var(--phone-width);
+    min-height: min(var(--phone-height), calc(100dvh - 2.5rem));
+    max-height: calc(100dvh - 2.5rem);
+    overflow-y: auto;
+    border-radius: 2.25rem;
+    box-shadow:
+      0 0 0 1px rgb(201 123 132 / 0.12),
+      0 24px 48px -12px rgb(42 36 40 / 0.22);
+  }
+}
+
+.phone-fixed-layer {
+  left: 50%;
+  width: 100%;
+  max-width: var(--phone-width);
+  transform: translateX(-50%);
+}
+
+/* Lifeline ECG animation */
+.lifeline-trace {
+  stroke-dasharray: 8 6;
+  animation: lifeline-dash 1.1s linear infinite;
+}
+
+@keyframes lifeline-dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+.lifeline-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(250 247 244 / 0) 35%,
+    rgb(250 247 244 / 0.85) 50%,
+    rgb(250 247 244 / 0) 65%,
+    transparent 100%
+  );
+  animation: lifeline-sweep 2.4s ease-in-out infinite;
+}
+
+@keyframes lifeline-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Motherboard Future Heart Replay */
+.replay-card {
+  animation: replay-fade-in 0.55s ease-out both;
+}
+
+@keyframes replay-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.replay-path {
+  stroke-dasharray: 6 4;
+  animation: replay-dash 2.5s linear infinite;
+}
+
+@keyframes replay-dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* CARECHAIN interactive demos — dark panel inside light mobile shell */
+.demo-panel {
+  border-radius: 1rem;
+  border: 1px solid var(--color-slate-border);
+  background: var(--color-slate);
+  padding: 1.25rem;
+  color: #f0f2f7;
+}
+
+/* ─── CARECHAIN demo internals ─────────────────────────── */
+
+/* Monospace signal labels */
+.cc-mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+/* Signal timeline row animation */
+.cc-signal-row {
+  animation: cc-row-in 0.45s ease-out both;
+}
+
+@keyframes cc-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Interpretation diff "reveal" highlight on CARECHAIN column */
+.cc-diff-carechain {
+  background: rgb(158 79 90 / 0.07);
+  border-left: 2px solid var(--color-rose-deep);
+}
+
+/* Continuity gap connector pulse */
+.cc-gap-pulse {
+  animation: cc-gap-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes cc-gap-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Verdict banner appear */
+.cc-verdict {
+  animation: cc-verdict-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cc-verdict-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Bottom nav — center home button press */
+.nav-home-expand {
+  transform: scale(1.16);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
