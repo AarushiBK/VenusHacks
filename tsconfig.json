@@ -17,5 +17,12 @@
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "src/ai/assistantMemory.ts",
+    "src/ai/embeddings.ts",
+    "src/ai/embeddings.native.ts",
+    "src/ai/voiceController.ts",
+    "src/ai/ragEngine.ts"
+  ]
 }

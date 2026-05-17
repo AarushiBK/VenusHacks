@@ -202,7 +202,8 @@ body {
 
 .bubble-photo--face {
   object-fit: cover;
-  object-position: center center;
+  object-position: center 38%;
+  transform: scale(1.22);
 }
 
 /* Tech viewfinder corners on face scan */

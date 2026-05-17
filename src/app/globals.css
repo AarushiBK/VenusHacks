@@ -510,6 +510,22 @@ body {
   transform: scale(1.16);
 }
 
+/* Hera chat bubble emerging from home nav button */
+.hera-nav-bubble {
+  animation: hera-bubble-emerge 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hera-bubble-emerge {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Auth welcome — full iPhone 16 height, smooth palette blend */
 .phone-device-frame--welcome .auth-flow-inner--welcome {
   position: relative;

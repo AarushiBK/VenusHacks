@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HeraNavBubble } from "./HeraNavBubble";
 
 export type NavActive =
   | "platform"
@@ -120,35 +121,40 @@ function HomeIcon({ active }: { active: boolean }) {
 function SideNavTab({
   tab,
   isActive,
+  showHeraBubble = false,
 }: {
   tab: SideTab;
   isActive: boolean;
+  showHeraBubble?: boolean;
 }) {
   return (
-    <Link
-      href={tab.href}
-      aria-current={isActive ? "page" : undefined}
-      className={`flex min-w-0 flex-1 flex-col items-center justify-end gap-1 pb-0.5 transition-colors ${
-        isActive ? "text-rose-deep" : "text-muted"
-      }`}
-    >
-      <span
-        className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors ${
-          isActive
-            ? "border-rose/40 bg-blush/60"
-            : "border-blush/80 bg-white"
+    <div className="relative flex min-w-0 flex-1 flex-col items-center">
+      {showHeraBubble && <HeraNavBubble />}
+      <Link
+        href={tab.href}
+        aria-current={isActive ? "page" : undefined}
+        className={`flex w-full min-w-0 flex-col items-center justify-end gap-1 pb-0.5 transition-colors ${
+          isActive ? "text-rose-deep" : "text-muted"
         }`}
       >
-        {tab.icon(isActive)}
-      </span>
-      <span
-        className={`text-[10px] leading-none font-medium tracking-wide ${
-          isActive ? "font-semibold" : ""
-        }`}
-      >
-        {tab.label}
-      </span>
-    </Link>
+        <span
+          className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors ${
+            isActive
+              ? "border-rose/40 bg-blush/60"
+              : "border-blush/80 bg-white"
+          }`}
+        >
+          {tab.icon(isActive)}
+        </span>
+        <span
+          className={`text-[10px] leading-none font-medium tracking-wide ${
+            isActive ? "font-semibold" : ""
+          }`}
+        >
+          {tab.label}
+        </span>
+      </Link>
+    </div>
   );
 }
 
@@ -194,7 +200,13 @@ function HomeNavTab({ isActive }: { isActive: boolean }) {
   );
 }
 
-export function BottomNav({ active }: { active: NavActive }) {
+export function BottomNav({
+  active,
+  showHeraBubble = true,
+}: {
+  active: NavActive;
+  showHeraBubble?: boolean;
+}) {
   const left = SIDE_TABS.slice(0, 2);
   const right = SIDE_TABS.slice(2);
 
@@ -209,7 +221,12 @@ export function BottomNav({ active }: { active: NavActive }) {
         ))}
         <HomeNavTab isActive={active === "platform"} />
         {right.map((tab) => (
-          <SideNavTab key={tab.id} tab={tab} isActive={active === tab.id} />
+          <SideNavTab
+            key={tab.id}
+            tab={tab}
+            isActive={active === tab.id}
+            showHeraBubble={showHeraBubble && tab.id === "health"}
+          />
         ))}
       </div>
     </nav>
