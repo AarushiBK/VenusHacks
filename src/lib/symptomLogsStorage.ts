@@ -1,8 +1,8 @@
-import { DEMO_SYMPTOM_LOGS } from "@/lib/demo/demoSymptomSeed";
 import type { SymptomLogEntry } from "../types/symptoms";
 
 const STORAGE_KEY = "vitacor_symptom_logs";
 const DEMO_SEEDED_KEY = "vitacor_demo_symptoms_seeded";
+const DEMO_SEED_VERSION = "v2";
 
 function readAll(): SymptomLogEntry[] {
   try {
@@ -45,11 +45,24 @@ export function getTodayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-/** Seed Maya demo symptom timeline once per browser (for hackathon pitch). */
-export function seedDemoSymptomLogsIfEmpty(): void {
+/** Seed Maya demo symptom timeline (~165 entries) for hackathon pitch. */
+export async function seedDemoSymptomLogsIfEmpty(): Promise<void> {
   if (typeof window === "undefined") return;
-  if (localStorage.getItem(DEMO_SEEDED_KEY) === "1") return;
-  if (readAll().length > 0) return;
-  writeAll([...DEMO_SYMPTOM_LOGS]);
-  localStorage.setItem(DEMO_SEEDED_KEY, "1");
+  if (localStorage.getItem(DEMO_SEEDED_KEY) === DEMO_SEED_VERSION) return;
+  await seedMayaSymptomLogs();
+}
+
+/** Load full Maya symptom timeline (used on Maya sign-in). */
+export async function seedMayaSymptomLogs(): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    const res = await fetch("/demo/demo_symptom_logs.json");
+    if (!res.ok) return;
+    const logs = (await res.json()) as SymptomLogEntry[];
+    if (!Array.isArray(logs) || logs.length === 0) return;
+    writeAll(logs);
+    localStorage.setItem(DEMO_SEEDED_KEY, DEMO_SEED_VERSION);
+  } catch {
+    /* offline or missing file */
+  }
 }

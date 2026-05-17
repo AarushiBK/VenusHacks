@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { setAuthenticated } from "@/lib/authSession";
+import { activateMayaDemoSession, isMayaDemoEmail } from "@/lib/demo/mayaDemo";
 import { saveAccountEmail, savePassword } from "@/lib/profileStorage";
 import {
   isGoogleUser,
@@ -65,6 +66,11 @@ function SignUpContent() {
   }
 
   async function handleDemoSignUp(data: SignUpFormState) {
+    if (isMayaDemoEmail(data.email)) {
+      await activateMayaDemoSession();
+      router.replace("/");
+      return;
+    }
     saveAccountEmail(data.email.trim());
     savePassword(data.password);
     const firstName = data.fullName.trim().split(/\s+/)[0] ?? "Alex";

@@ -8,6 +8,11 @@ import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { setAuthenticated } from "@/lib/authSession";
 import {
+  activateMayaDemoSession,
+  isMayaDemoEmail,
+  MAYA_DEMO_PASSWORD,
+} from "@/lib/demo/mayaDemo";
+import {
   loadAccountEmail,
   saveAccountEmail,
   verifyPassword,
@@ -29,8 +34,20 @@ export function SignInScreen() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleDemoSignIn(email: string, password: string) {
+    const normalized = email.trim().toLowerCase();
+
+    if (isMayaDemoEmail(normalized)) {
+      if (password !== MAYA_DEMO_PASSWORD && !verifyPassword(password)) {
+        setError("Email or password is incorrect.");
+        return;
+      }
+      await activateMayaDemoSession();
+      router.replace("/");
+      return;
+    }
+
     const storedEmail = loadAccountEmail();
-    if (email.trim().toLowerCase() !== storedEmail.toLowerCase()) {
+    if (normalized !== storedEmail.toLowerCase()) {
       setError("Email or password is incorrect.");
       return;
     }
@@ -96,7 +113,6 @@ export function SignInScreen() {
         <p className="text-muted mt-2 text-sm leading-relaxed">
           Welcome back. Sign in to continue tracking your heart health.
         </p>
-
         <div className="mt-8">
           <SignInForm
             onSubmit={handleSignIn}

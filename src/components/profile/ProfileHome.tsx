@@ -9,6 +9,13 @@ import {
 } from "@/lib/demo/wellnessAssessment";
 import { getAvgMetrics } from "@/lib/profile";
 import { isMetricId, type MetricId } from "@/lib/metricHistory";
+import { useAuth } from "@/context/AuthContext";
+import {
+  activateMayaDemoSession,
+  isMayaDemoEmail,
+  isMayaUser,
+} from "@/lib/demo/mayaDemo";
+import { loadAccountEmail } from "@/lib/profileStorage";
 import { seedDemoSymptomLogsIfEmpty } from "@/lib/symptomLogsStorage";
 import { mockPatient } from "@/lib/vitals";
 import { AvgMetricGrid } from "./AvgMetricGrid";
@@ -18,6 +25,7 @@ import { SendReportPanel } from "./SendReportPanel";
 import { SettingsPanel } from "./SettingsPanel";
 
 export function ProfileHome() {
+  const { user, profile } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [selectedMetricId, setSelectedMetricId] = useState<MetricId | null>(null);
@@ -25,10 +33,24 @@ export function ProfileHome() {
   const [wellness, setWellness] = useState<WellnessAssessment | null>(null);
   const [wellnessLoading, setWellnessLoading] = useState(true);
 
+  const mayaSession = isMayaUser({
+    email: user?.email ?? loadAccountEmail(),
+    fullName: profile?.fullName,
+    displayName: user?.displayName,
+  });
+
+  const patient = mayaSession
+    ? mockPatient
+    : { ...mockPatient, name: "You", detail: "Personal cardiovascular tracking" };
+
   useEffect(() => {
-    seedDemoSymptomLogsIfEmpty();
     let cancelled = false;
     (async () => {
+      if (mayaSession) {
+        await activateMayaDemoSession();
+      } else {
+        await seedDemoSymptomLogsIfEmpty();
+      }
       const scan = await fetchScanSummary();
       if (cancelled) return;
       setWellness(assessFromSymptomsAndVitals(scan));
@@ -37,7 +59,7 @@ export function ProfileHome() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [mayaSession]);
 
   return (
     <>
@@ -49,7 +71,7 @@ export function ProfileHome() {
       ) : (
         <>
           <HomeHeader
-            patient={mockPatient}
+            patient={patient}
             onOpenSettings={() => setSettingsOpen(true)}
           />
 

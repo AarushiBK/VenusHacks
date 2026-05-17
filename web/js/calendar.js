@@ -17,27 +17,56 @@ function scanDateKey(scan) {
   return d.toISOString().slice(0, 10);
 }
 
+function deriveQuality(scan) {
+  const existing = scan.quality;
+  if (existing && existing !== "unknown" && existing !== "legacy_preview") {
+    if (existing === "too_short") return "poor";
+    return existing;
+  }
+  const sqi = scan.sqi ?? scan.confidence;
+  if (sqi == null) return "marginal";
+  if (sqi >= 0.55) return "good";
+  if (sqi >= 0.4) return "marginal";
+  return "poor";
+}
+
+function qualityLabel(q) {
+  if (q === "good") return "Good";
+  if (q === "marginal") return "OK";
+  if (q === "poor" || q === "too_short") return "Weak";
+  return "—";
+}
+
 function pickBestScanPerDay(scans) {
   const byDay = new Map();
   for (const s of scans) {
-    if (!s.bpm || (s.engine !== "open-rppg" && s.source !== "iphone_web_open_rppg")) continue;
+    if (!s.bpm) continue;
     const key = scanDateKey(s);
     if (!key) continue;
     const prev = byDay.get(key);
-    const score = (s.trustworthy ? 2 : 0) + (s.sqi ?? s.confidence ?? 0);
+    const q = deriveQuality(s);
+    const score =
+      (q === "good" ? 3 : q === "marginal" ? 2 : 1) + (s.sqi ?? s.confidence ?? 0);
     const prevScore = prev
-      ? (prev.trustworthy ? 2 : 0) + (prev.sqi ?? prev.confidence ?? 0)
+      ? (prev._calScore ?? 0)
       : -1;
-    if (score >= prevScore) byDay.set(key, s);
+    if (score >= prevScore) {
+      byDay.set(key, { ...s, quality: q, _calScore: score });
+    }
   }
   return byDay;
+}
+
+function latestDayKey(byDay) {
+  const keys = [...byDay.keys()].sort();
+  return keys.length ? keys[keys.length - 1] : null;
 }
 
 function computeTrend(scansByDay, phase) {
   const keys = [...scansByDay.keys()].sort();
   const trustworthy = keys
     .map((k) => scansByDay.get(k))
-    .filter((s) => s.trustworthy && s.bpm);
+    .filter((s) => s.bpm && deriveQuality(s) !== "poor");
   if (trustworthy.length < 4) {
     return { label: "Building trend", detail: "Need more good daily scans", dir: "neutral" };
   }
@@ -73,11 +102,16 @@ function computeTrend(scansByDay, phase) {
 }
 
 export function renderCalendar(container, scans, baseline, options = {}) {
-  const now = options.anchorDate ? new Date(options.anchorDate) : new Date();
-  let year = now.getFullYear();
-  let month = now.getMonth();
-
   const byDay = pickBestScanPerDay(scans);
+  const anchorKey = latestDayKey(byDay);
+  const anchorDate = anchorKey
+    ? new Date(`${anchorKey}T12:00:00`)
+    : options.anchorDate
+      ? new Date(options.anchorDate)
+      : new Date();
+  let year = anchorDate.getFullYear();
+  let month = anchorDate.getMonth();
+
   const trend = computeTrend(byDay, baseline?.phase || "pregnancy");
 
   function renderMonth() {
@@ -94,11 +128,13 @@ export function renderCalendar(container, scans, baseline, options = {}) {
       let cls = "cal-cell cal-day";
       let inner = String(d);
       if (scan) {
-        cls += ` cal-has cal-${scan.quality || "unknown"}`;
+        const q = deriveQuality(scan);
+        cls += ` cal-has cal-${q}`;
         inner = `<span class="cal-num">${d}</span><span class="cal-bpm">${Math.round(scan.bpm)}</span>`;
       }
+      const today = new Date();
       const isToday =
-        year === now.getFullYear() && month === now.getMonth() && d === now.getDate();
+        year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
       if (isToday) cls += " cal-today";
       cells += `<button type="button" class="${cls}" data-day="${key}" ${scan ? "" : "disabled"}>${inner}</button>`;
     }
@@ -122,7 +158,7 @@ export function renderCalendar(container, scans, baseline, options = {}) {
         <span><i class="dot marginal"></i> OK</span>
         <span><i class="dot poor"></i> Weak</span>
       </div>
-      <p id="calDetail" class="cal-detail">Tap a highlighted day for details</p>
+      <p id="calDetail" class="cal-detail">Tap a highlighted day · colors from signal quality (SQI)</p>
     `;
 
     container.querySelectorAll("[data-cal]").forEach((btn) => {
@@ -156,8 +192,8 @@ export function renderCalendar(container, scans, baseline, options = {}) {
               ? "HRV unavailable (low signal)"
               : "No HRV";
         const vs = formatBaselineDisplay(scan, baseline);
-        const q = scan.quality || "unknown";
-        el.textContent = `${btn.dataset.day}: ${Math.round(scan.bpm)} BPM · ${q} scan · ${vs} · ${hrv}`;
+        const q = deriveQuality(scan);
+        el.textContent = `${btn.dataset.day}: ${Math.round(scan.bpm)} BPM · ${qualityLabel(q)} scan · ${vs} · ${hrv}`;
       });
     });
   }
@@ -165,3 +201,4 @@ export function renderCalendar(container, scans, baseline, options = {}) {
   renderMonth();
   bindDayClicks();
 }
+

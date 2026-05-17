@@ -95,7 +95,14 @@
 
     </div>
 
-
+    <div id="careActions" class="care-actions hidden" aria-label="Support loop">
+      <button type="button" id="btnAlertSupporter" class="btn-care btn-care-supporter">
+        Alert supporter (SMS)
+      </button>
+      <button type="button" id="btnConnectProvider" class="btn-care btn-care-provider">
+        Connect to provider
+      </button>
+    </div>
 
     <section class="metrics-card" aria-live="polite">
 
@@ -156,6 +163,64 @@
         </label>
 
         <button type="button" id="btnLockBaseline" class="btn-text hidden">Lock pre-pregnancy baseline</button>
+
+      </div>
+
+    </details>
+
+
+
+    <details class="fold fold-equity" open>
+
+      <summary>Equity calibration</summary>
+
+      <div class="fold-body equity-fold">
+
+        <label class="equity-toggle">
+
+          <input type="checkbox" id="equityCalibToggle" checked />
+
+          <span class="equity-toggle-ui" aria-hidden="true"></span>
+
+          <span class="equity-toggle-text">
+
+            <strong>Ethnicity-aware rPPG</strong>
+
+            <span id="equityCalibHint" class="equity-hint">Compensates melanin-related signal attenuation</span>
+
+          </span>
+
+        </label>
+
+        <label class="field">
+
+          <span class="field-label">Skin tone / ethnicity profile</span>
+
+          <select id="ethnicitySelect">
+
+            <option value="Asian">Asian</option>
+
+            <option value="Black or African American">Black or African American</option>
+
+            <option value="Hispanic or Latina">Hispanic or Latina</option>
+
+            <option value="Middle Eastern or North African">Middle Eastern or North African</option>
+
+            <option value="White">White</option>
+
+            <option value="Multiracial">Multiracial</option>
+
+            <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+
+            <option value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</option>
+
+            <option value="Prefer not to say">Prefer not to say</option>
+
+          </select>
+
+        </label>
+
+        <p class="equity-note">Education-only demo — not a medical device. Improves pulse detection equity across skin tones.</p>
 
       </div>
 
@@ -265,7 +330,7 @@
 
 
 
-  <script type="module" src="/scanner/js/scanner.js?v=16"></script>
+  <script type="module" src="/scanner/js/scanner.js?v=17"></script>
 
 </body>
 

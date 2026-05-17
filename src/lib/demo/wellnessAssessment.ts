@@ -9,6 +9,10 @@ export interface ScanSummary {
   scanCount: number;
   deltaFromBaseline: number | null;
   recoveryLabel: string | null;
+  recoveryZone: string | null;
+  recoveryDetail: string | null;
+  phase: string | null;
+  rollingMedianBpm: number | null;
 }
 
 export interface WellnessAssessment {
@@ -38,9 +42,11 @@ export function assessFromSymptomsAndVitals(
   );
 
   let level: WellnessLevel = "healthy";
-  if (urgentHits >= 2 || (scan?.deltaFromBaseline ?? 0) >= 18) {
+  const zone = scan?.recoveryZone;
+  if (zone === "red" || urgentHits >= 2 || (scan?.deltaFromBaseline ?? 0) >= 18) {
     level = "critical";
   } else if (
+    zone === "amber" ||
     urgentHits >= 1 ||
     elevatedVitals ||
     (scan?.deltaFromBaseline ?? 0) >= 12
@@ -49,11 +55,22 @@ export function assessFromSymptomsAndVitals(
   }
 
   const signals: string[] = [];
+  if (scan?.scanCount != null && scan.scanCount > 0) {
+    signals.push(`${scan.scanCount} trustworthy mirror scan(s) in your timeline`);
+  }
   if (scan?.latestBpm != null && scan.referenceBpm != null) {
     const d = scan.deltaFromBaseline ?? scan.latestBpm - scan.referenceBpm;
     signals.push(
-      `Mirror scan: ${Math.round(scan.latestBpm)} bpm (${d >= 0 ? "+" : ""}${Math.round(d)} vs locked baseline ${Math.round(scan.referenceBpm)} bpm)`,
+      `Latest mirror scan: ${Math.round(scan.latestBpm)} bpm (${d >= 0 ? "+" : ""}${Math.round(d)} vs locked baseline ${Math.round(scan.referenceBpm)} bpm)`,
     );
+  }
+  if (scan?.recoveryLabel) {
+    signals.push(
+      `Recovery zone (${scan.phase ?? "postpartum"}): ${scan.recoveryLabel}${scan.recoveryDetail ? ` — ${scan.recoveryDetail}` : ""}`,
+    );
+  }
+  if (scan?.rollingMedianBpm != null) {
+    signals.push(`Rolling median HR from recent scans: ${Math.round(scan.rollingMedianBpm)} bpm`);
   }
   if (recent.length > 0) {
     signals.push(`${recent.length} symptom log(s) in the last 30 days`);
@@ -104,7 +121,9 @@ export async function fetchScanSummary(): Promise<ScanSummary | null> {
     const baseline = (await baselineRes.json()) as {
       reference_bpm?: number;
       scan_count?: number;
-      recovery?: { label?: string };
+      phase?: string;
+      rolling_median_bpm?: number;
+      recovery?: { label?: string; detail?: string; zone?: string };
     };
 
     const latestBpm = latest.bpm && latest.bpm > 0 ? latest.bpm : null;
@@ -118,6 +137,10 @@ export async function fetchScanSummary(): Promise<ScanSummary | null> {
       scanCount: baseline.scan_count ?? 0,
       deltaFromBaseline,
       recoveryLabel: baseline.recovery?.label ?? null,
+      recoveryZone: baseline.recovery?.zone ?? null,
+      recoveryDetail: baseline.recovery?.detail ?? null,
+      phase: baseline.phase ?? null,
+      rollingMedianBpm: baseline.rolling_median_bpm ?? null,
     };
   } catch {
     return null;

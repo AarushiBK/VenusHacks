@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CareSupportActions } from "@/components/care/CareSupportActions";
 import type { WellnessAssessment, WellnessLevel } from "@/lib/demo/wellnessAssessment";
 
 const LEVEL_STYLES: Record<
@@ -67,12 +68,20 @@ export function WellnessSummaryCard({
         ))}
       </ul>
 
+      <CareSupportActions level={assessment.level} compact />
+
       <div className="mt-3 flex flex-wrap gap-2">
         <Link
-          href="/metrics"
+          href="/symptoms/log"
           className="rounded-full bg-rose-deep px-3 py-1.5 text-[11px] font-semibold text-white"
         >
-          Face scan history
+          Log symptoms
+        </Link>
+        <Link
+          href="/metrics"
+          className="rounded-full border border-rose/30 bg-white/80 px-3 py-1.5 text-[11px] font-semibold text-rose-deep"
+        >
+          Face scan
         </Link>
         <Link
           href="/symptoms/charts"
@@ -82,9 +91,19 @@ export function WellnessSummaryCard({
         </Link>
       </div>
 
-      <p className="text-muted mt-2 text-[10px] leading-relaxed">
-        Demo user Maya Chen · synthetic longitudinal data for pitch only.
-      </p>
+      {assessment.scan && (
+        <p className="text-muted mt-3 text-[10px] leading-relaxed">
+          <span className="text-ink font-semibold">How this is calculated:</span>{" "}
+          We combine your locked pre-pregnancy baseline (
+          {assessment.scan.referenceBpm != null
+            ? `${Math.round(assessment.scan.referenceBpm)} bpm`
+            : "not set"}
+          ), latest mirror scan, rolling median HR, recovery zone from the rPPG server, 30-day
+          symptoms (preeclampsia watch list), and wearable BP. New scans you take append to this
+          timeline.
+        </p>
+      )}
+
     </section>
   );
 }

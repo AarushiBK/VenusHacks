@@ -1,4 +1,3 @@
-import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import {
   PhoneDeviceFrame,
   type PhoneFrameVariant,
@@ -14,7 +13,7 @@ export function AuthShell({
   return (
     <div className="auth-flow-root">
       <div className="phone-app-viewport">
-        <PhoneDeviceFrame variant={variant} overlay={<FirebaseSetupNotice />}>
+        <PhoneDeviceFrame variant={variant}>
           <div className={`auth-flow-inner auth-flow-inner--${variant}`}>
             {children}
           </div>
