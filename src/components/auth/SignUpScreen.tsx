@@ -143,7 +143,7 @@ function SignUpContent() {
           </p>
         )}
 
-        <div className="mt-4 min-h-0 flex-1">
+        <div className="mt-4 flex min-h-0 flex-1 flex-col">
           <SignUpForm
             profile={profileData}
             onChange={updateProfile}
@@ -159,14 +159,6 @@ function SignUpContent() {
           />
         </div>
 
-        {!skipAccountStep && (
-          <p className="text-muted mt-6 text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="text-rose-deep font-semibold">
-              Sign in
-            </Link>
-          </p>
-        )}
       </div>
     </AuthShell>
   );

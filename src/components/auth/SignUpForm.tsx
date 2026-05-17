@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import {
   ACTIVITY_OPTIONS,
@@ -135,7 +136,7 @@ export function SignUpForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
       <SignUpProgressBar currentStep={step} />
 
       {errorMessage && (
@@ -144,7 +145,7 @@ export function SignUpForm({
         </p>
       )}
 
-      <div className="flex flex-col gap-5 pb-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-4">
         {step === 1 && !skipAccountStep && (
           <>
             {onGoogleSignIn && (
@@ -451,7 +452,7 @@ export function SignUpForm({
         )}
       </div>
 
-      <div className="sticky bottom-0 -mx-4 mt-6 flex gap-3 border-t border-border/60 bg-cream px-4 py-4 safe-bottom">
+      <div className="border-border/60 bg-cream safe-bottom mt-4 flex shrink-0 gap-3 border-t pt-4">
         {(step > 1 || !skipAccountStep) && step > (skipAccountStep ? 2 : 1) && (
           <Button type="button" variant="secondary" onClick={goBack} className="flex-1" disabled={submitting}>
             Back
@@ -465,6 +466,14 @@ export function SignUpForm({
               : "Create account"}
         </Button>
       </div>
+      {!skipAccountStep && (
+        <p className="text-muted mt-4 shrink-0 pb-1 text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="text-rose-deep font-semibold">
+            Sign in
+          </Link>
+        </p>
+      )}
     </form>
   );
 }
