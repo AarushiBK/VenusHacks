@@ -39,6 +39,18 @@ body {
   overscroll-behavior: none;
 }
 
+/* Hide scrollbars; touch / trackpad scrolling still works */
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 .welcome-gradient {
   background: linear-gradient(
     180deg,
