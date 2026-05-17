@@ -31,6 +31,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
 
+  const fetchProfileForUser = useCallback(async (uid: string) => {
+    setProfileLoading(true);
+    try {
+      const doc = await getUserProfile(uid);
+      setProfile(doc);
+    } catch {
+      setProfile(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  }, []);
+
   const refreshProfile = useCallback(async () => {
     if (!auth) return;
     const current = auth.currentUser;
@@ -38,14 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-    setProfileLoading(true);
-    try {
-      const doc = await getUserProfile(current.uid);
-      setProfile(doc);
-    } finally {
-      setProfileLoading(false);
-    }
-  }, []);
+    await fetchProfileForUser(current.uid);
+  }, [fetchProfileForUser]);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
@@ -62,19 +68,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setProfileLoading(true);
-      try {
-        const doc = await getUserProfile(nextUser.uid);
-        setProfile(doc);
-      } catch {
-        setProfile(null);
-      } finally {
-        setProfileLoading(false);
-      }
+      await fetchProfileForUser(nextUser.uid);
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchProfileForUser]);
 
   const value = useMemo(
     () => ({

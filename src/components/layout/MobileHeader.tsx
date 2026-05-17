@@ -15,10 +15,21 @@ export function MobileHeader({
     <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border/60 bg-cream/95 px-4 py-3 backdrop-blur-sm safe-top">
       <Link
         to={backTo}
-        className="flex size-10 shrink-0 items-center justify-center rounded-full text-lg text-burgundy transition active:bg-burgundy/10"
+        className="flex size-10 shrink-0 items-center justify-center rounded-full text-burgundy transition active:bg-burgundy/10"
         aria-label={backLabel}
       >
-        ←
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-6"
+          aria-hidden
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
       </Link>
       {title ? (
         <h1 className="truncate font-display text-lg font-semibold text-ink">{title}</h1>

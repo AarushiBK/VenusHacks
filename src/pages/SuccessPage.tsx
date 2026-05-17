@@ -40,9 +40,15 @@ export function SuccessPage() {
           Welcome{profile?.fullName ? `, ${profile.fullName.split(" ")[0]}` : ""}!
         </h1>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
-          Your profile is saved to Firebase. Your cardiovascular risk dashboard is
-          coming next.
+          Your profile is saved to Firebase. Start tracking symptoms to protect your
+          heart health.
         </p>
+        <Link
+          to="/symptoms"
+          className="mt-6 flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl bg-burgundy px-5 py-3.5 text-base font-semibold text-white shadow-md shadow-burgundy/20 active:scale-[0.98]"
+        >
+          Open symptoms
+        </Link>
         {user?.email && (
           <p className="mt-2 text-xs text-muted">Signed in as {user.email}</p>
         )}
