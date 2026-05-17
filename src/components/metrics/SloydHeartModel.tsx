@@ -17,7 +17,7 @@ function applyRoseGlassMaterial(object: THREE.Object3D) {
       child.receiveShadow = true;
       child.material = new THREE.MeshPhysicalMaterial({
         color: "#e8a8b0",
-        emissive: "#c97b84",
+        emissive: "#9e4f5a",
         emissiveIntensity: 0.18,
         roughness: 0.06,
         metalness: 0.08,
