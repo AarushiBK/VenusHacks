@@ -7,7 +7,7 @@ import {
   ShowInChartsLink,
   SymptomSummaryCard,
 } from "@/components/symptoms/SymptomSummaryCard";
-import { getLogsForDay, getTodayIsoDate } from "@/lib/symptomLogsStorage";
+import { getLogsForDay, getTodayIsoDate, seedDemoSymptomLogsIfEmpty } from "@/lib/symptomLogsStorage";
 import type { SymptomLogEntry } from "@/types/symptoms";
 
 function formatTodayHeading() {
@@ -26,6 +26,10 @@ function SymptomsHomeContent() {
   const searchParams = useSearchParams();
   const fromLogged = searchParams.get("logged") === "1";
   const [visible, setVisible] = useState(!fromLogged);
+
+  useEffect(() => {
+    void seedDemoSymptomLogsIfEmpty();
+  }, []);
 
   useEffect(() => {
     if (!fromLogged) return;

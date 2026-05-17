@@ -22,10 +22,10 @@ export function Lifeline({ bpm }: { bpm: number }) {
         >
           <defs>
             <linearGradient id="lifeline-fade" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#c97b84" stopOpacity="0.15" />
-              <stop offset="12%" stopColor="#c97b84" stopOpacity="1" />
-              <stop offset="88%" stopColor="#9e4f5a" stopOpacity="1" />
-              <stop offset="100%" stopColor="#9e4f5a" stopOpacity="0.15" />
+              <stop offset="0%" stopColor="#9e4f5a" stopOpacity="0.15" />
+              <stop offset="12%" stopColor="#9e4f5a" stopOpacity="1" />
+              <stop offset="88%" stopColor="#7b2d4e" stopOpacity="1" />
+              <stop offset="100%" stopColor="#7b2d4e" stopOpacity="0.15" />
             </linearGradient>
           </defs>
           <path

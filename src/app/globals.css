@@ -7,8 +7,9 @@
 
   --color-cream: #faf7f4;
   --color-blush: #f3e8e4;
-  --color-rose: #c97b84;
-  --color-rose-deep: #9e4f5a;
+  /* rose/coral tokens alias burgundy (no soft red) */
+  --color-rose: #9e4f5a;
+  --color-rose-deep: #7b2d4e;
   --color-sage: #6b8f7a;
   --color-sage-light: #e8f0eb;
   --color-ink: #2a2428;
@@ -23,7 +24,7 @@
   /* Log-in branch aliases */
   --color-burgundy: #9e4f5a;
   --color-burgundy-dark: #7b2d4e;
-  --color-coral: #c97b84;
+  --color-coral: #9e4f5a;
   --color-cream-dark: #f3ebe4;
   --color-border: #e8ddd6;
 
@@ -33,11 +34,19 @@
   --color-slate-border: #3d4460;
   --color-slate-muted: #8b92a8;
   --color-grid: #e8eaed;
-  --color-carechain-glow: #c97b84;
+  --color-carechain-glow: #9e4f5a;
   --font-mono: "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", monospace;
 
-  --phone-width: 390px;
-  --phone-height: 844px;
+  /* iPhone 16 logical resolution — 19.5:9 */
+  --phone-width: 393px;
+  --phone-height: 852px;
+  --phone-radius: 3.4375rem;
+  --ios-island-top: 11px;
+  --ios-island-height: 37px;
+  --ios-below-island: calc(var(--ios-island-top) + var(--ios-island-height) + 8px);
+  --ios-toast-height: 4.25rem;
+  --ios-content-below-toast: calc(var(--ios-below-island) + var(--ios-toast-height) + 6px);
+  --ios-safe-bottom: max(env(safe-area-inset-bottom, 0px), 34px);
 }
 
 body {
@@ -63,25 +72,268 @@ body {
   min-height: 100dvh;
   margin-left: auto;
   margin-right: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   background: var(--color-cream);
+}
+
+/* iPhone 16 frame + safe areas */
+.phone-device-frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.phone-device-content {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 0;
+  padding-bottom: var(--ios-safe-bottom);
+}
+
+.phone-status-region {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding-top: var(--ios-island-top);
+}
+
+.phone-dynamic-island {
+  display: block;
+  width: 126px;
+  height: var(--ios-island-height);
+  border-radius: 999px;
+  background: #000;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 1px 3px rgb(0 0 0 / 0.35);
+}
+
+.phone-home-indicator-wrap {
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  left: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+}
+
+.phone-home-indicator {
+  display: block;
+  width: 134px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(42 36 40 / 0.22);
+}
+
+@media (max-width: 419px) {
+  .phone-status-region,
+  .phone-home-indicator-wrap {
+    display: none;
+  }
+
+  .phone-device-content {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  }
+
+  .phone-device-frame--welcome,
+  .phone-device-frame--auth {
+    --ios-below-island: max(
+      calc(env(safe-area-inset-top, 0px) + 8px),
+      calc(var(--ios-island-top) + var(--ios-island-height) + 8px)
+    );
+  }
 }
 
 @media (min-width: 420px) {
   .phone-app-viewport {
-    padding: 1.25rem 0.75rem;
+    align-items: center;
+    padding: 1rem 0.75rem;
   }
 
   .phone-app-device {
     width: var(--phone-width);
-    min-height: min(var(--phone-height), calc(100dvh - 2.5rem));
-    max-height: calc(100dvh - 2.5rem);
-    overflow-y: auto;
-    border-radius: 2.25rem;
+    height: min(var(--phone-height), calc(100dvh - 2rem));
+    min-height: unset;
+    max-height: calc(100dvh - 2rem);
+    aspect-ratio: 393 / 852;
+    border-radius: var(--phone-radius);
     box-shadow:
-      0 0 0 1px rgb(201 123 132 / 0.12),
-      0 24px 48px -12px rgb(42 36 40 / 0.22);
+      0 0 0 1px rgb(158 79 90 / 0.14),
+      0 28px 56px -14px rgb(42 36 40 / 0.28);
   }
+
+  .phone-device-frame {
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .phone-device-content {
+    --ios-safe-bottom: 34px;
+  }
+
+  /* In-app pages: clear Dynamic Island */
+  .phone-device-frame:not(.phone-device-frame--welcome):not(
+      .phone-device-frame--auth
+    )
+    .phone-device-content {
+    padding-top: var(--ios-below-island);
+  }
+}
+
+/* Welcome: burgundy fills status area; gradient is full frame */
+.phone-device-frame--welcome {
+  background: #7b2d4e;
+}
+
+.phone-device-frame--welcome .phone-device-content {
+  overflow: visible;
+}
+
+.phone-device-frame--auth .phone-device-content {
+  overflow-y: auto;
+}
+
+.auth-flow-root {
+  min-height: 100dvh;
+  width: 100%;
+  background: #f3ebe4;
+}
+
+.auth-flow-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: 100%;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* Form auth: content sits below island / toast */
+.phone-device-frame--auth .auth-flow-inner--auth {
+  padding-top: var(--ios-below-island);
+}
+
+.phone-device-frame--auth:has(.ios-toast) .auth-flow-inner--auth {
+  padding-top: var(--ios-content-below-toast);
+}
+
+.phone-device-frame--welcome .auth-flow-inner--welcome {
+  padding-top: 0;
+}
+
+/* iOS toast — frame layer, directly under Dynamic Island */
+.ios-toast {
+  position: absolute;
+  top: var(--ios-below-island);
+  right: 0;
+  left: 0;
+  z-index: 55;
+  margin-inline: auto;
+  width: calc(100% - 2rem);
+  max-width: 21.5rem;
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 0.5px solid rgb(255 255 255 / 0.55);
+  background: rgb(255 255 255 / 0.82);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  box-shadow:
+    0 0.5px 0 rgb(255 255 255 / 0.6) inset,
+    0 4px 16px rgb(42 36 40 / 0.14);
+}
+
+.phone-device-frame--welcome .ios-toast {
+  border-color: rgb(255 255 255 / 0.4);
+  background: rgb(255 255 255 / 0.88);
+}
+
+.ios-toast-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.ios-toast-body {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--color-muted);
+}
+
+.ios-toast-body code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink);
+}
+
+/* Apple-style buttons (squircle, 50pt touch target) */
+.ios-btn,
+.ios-touch-target {
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  padding: 0 20px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-sans), system-ui,
+    sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+  transition:
+    transform 0.15s cubic-bezier(0.25, 0.1, 0.25, 1),
+    opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-btn {
+  display: flex;
+  width: 100%;
+  text-decoration: none;
+}
+
+@supports (corner-shape: squircle) {
+  .ios-btn,
+  .ios-touch-target {
+    corner-shape: squircle;
+    border-radius: 22px;
+  }
+}
+
+.ios-btn:active,
+.ios-touch-target:active {
+  transform: scale(0.98);
+  opacity: 0.92;
+}
+
+.ios-btn-primary {
+  background: var(--color-burgundy-dark);
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(123 45 78 / 0.25);
+}
+
+.ios-btn-secondary {
+  border: 1.5px solid rgb(158 79 90 / 0.35);
+  background: var(--color-cream);
+  color: var(--color-burgundy-dark);
 }
 
 .phone-fixed-layer {
@@ -188,7 +440,7 @@ body {
 /* Interpretation diff "reveal" highlight on CARECHAIN column */
 .cc-diff-carechain {
   background: rgb(158 79 90 / 0.07);
-  border-left: 2px solid var(--color-rose-deep);
+  border-left: 2px solid var(--color-burgundy);
 }
 
 /* Continuity gap connector pulse */
@@ -222,32 +474,100 @@ body {
   transform: scale(1.16);
 }
 
-/* Auth welcome — from Log-in branch */
+/* Auth welcome — full iPhone 16 height, smooth palette blend */
+.phone-device-frame--welcome .auth-flow-inner--welcome {
+  position: relative;
+  min-height: 100%;
+}
+
+.welcome-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.welcome-screen-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--ios-below-island) 1.25rem 1rem;
+}
+
+.phone-device-frame--welcome:has(.ios-toast) .welcome-screen-content {
+  padding-top: var(--ios-content-below-toast);
+}
+
 .welcome-sky-gradient {
+  /* Fallback: dense srgb stops for older engines */
   background: linear-gradient(
     180deg,
     #7b2d4e 0%,
-    color-mix(in srgb, #7b2d4e 94%, #faf7f4) 14%,
-    color-mix(in srgb, #7b2d4e 82%, #faf7f4) 26%,
-    color-mix(in srgb, #7b2d4e 68%, #faf7f4) 38%,
-    color-mix(in srgb, #7b2d4e 52%, #faf7f4) 50%,
-    color-mix(in srgb, #7b2d4e 36%, #faf7f4) 62%,
-    color-mix(in srgb, #7b2d4e 22%, #faf7f4) 74%,
-    color-mix(in srgb, #7b2d4e 10%, #faf7f4) 86%,
+    #843456 12%,
+    #943d5f 24%,
+    #9e4f5a 38%,
+    #a3626c 50%,
+    #b89090 62%,
+    #d4c4c2 74%,
+    #ebe4e1 86%,
     #faf7f4 100%
   );
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    #000 0%,
-    #000 78%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(180deg, #000 0%, #000 78%, transparent 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
-.welcome-sky-gradient-panel {
-  top: 0;
-  height: min(68%, 28rem);
+@supports (background: linear-gradient(in oklch, #7b2d4e, #faf7f4)) {
+  .welcome-sky-gradient {
+    background: linear-gradient(
+      180deg in oklch,
+      #7b2d4e 0%,
+      #9e4f5a 28%,
+      #a3626c 52%,
+      #f3e8e4 76%,
+      #faf7f4 100%
+    );
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+}
+
+.phone-device-frame--welcome .welcome-sky-gradient-full {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  height: 100%;
+  min-height: 100%;
+}
+
+.welcome-sky-glow {
+  position: absolute;
+  right: -5rem;
+  top: 14%;
+  z-index: 1;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 999px;
+  background: rgb(158 79 90 / 0.18);
+  filter: blur(80px);
+}
+
+@media (min-width: 420px) {
+  .phone-device-frame--welcome .welcome-sky-gradient-full {
+    height: 100%;
+    min-height: var(--phone-height);
+  }
+
+  .welcome-sky-glow {
+    top: 18%;
+  }
+
+  .phone-device-frame--welcome .phone-home-indicator {
+    background: rgb(255 255 255 / 0.35);
+  }
 }
 
 @keyframes fadeUp {

@@ -1,0 +1,10 @@
+{
+  "phase": "postpartum",
+  "routine_time": "07:30",
+  "reference_bpm": 72,
+  "reference_locked_at": "2024-12-28",
+  "ethnicity": "Asian",
+  "ethnicity_calibration_enabled": true,
+  "demo_user": "Maya Chen",
+  "updated_at": "2026-05-17T17:06:14.157588+00:00"
+}

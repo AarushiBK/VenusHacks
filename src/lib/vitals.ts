@@ -1,9 +1,9 @@
 import type { PatientContext, VitalReading } from "@/types/vitals";
 
 export const mockPatient: PatientContext = {
-  name: "Alex",
-  phase: "pregnant",
-  detail: "Week 28 · 3rd trimester",
+  name: "Maya",
+  phase: "postpartum",
+  detail: "Week 6 postpartum · recovery tracking",
 };
 
 export const mockVitals: VitalReading[] = [
@@ -12,11 +12,11 @@ export const mockVitals: VitalReading[] = [
     kind: "blood_pressure",
     label: "Blood pressure",
     unit: "mmHg",
-    value: "118",
-    secondaryValue: "76",
-    recordedAt: "2026-05-16T08:42:00",
-    status: "normal",
-    statusLabel: "Within range",
+    value: "132",
+    secondaryValue: "86",
+    recordedAt: "2026-06-08T08:42:00",
+    status: "elevated",
+    statusLabel: "Improving — still elevated",
     trend: "stable",
     note: "Pregnancy target: below 140/90",
   },
@@ -25,12 +25,12 @@ export const mockVitals: VitalReading[] = [
     kind: "heart_rate",
     label: "Heart rate",
     unit: "bpm",
-    value: "82",
-    recordedAt: "2026-05-16T08:42:00",
+    value: "71",
+    recordedAt: "2026-02-06T07:37:00",
     status: "normal",
-    statusLabel: "Resting",
+    statusLabel: "Near pre-pregnancy baseline",
     trend: "down",
-    note: "Typical pregnancy range: 70–90 bpm",
+    note: "Mirror scan baseline 72 bpm · latest 71 bpm (postpartum recovery)",
   },
   {
     id: "spo2-1",

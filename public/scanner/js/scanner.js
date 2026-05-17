@@ -3,10 +3,24 @@
  */
 
 import { RPPGProcessor, extractPulseSample, CONF_LOCK, MIN_SCAN_SEC } from "./rppg-core.js?v=5";
+import {
+  applyPulseCalibration,
+  applyBpmCalibration,
+  calibrationLabel,
+  confidenceBoost,
+  getEthnicityProfile,
+  isCalibrationEnabled,
+  setCalibrationEnabled,
+  setEthnicityProfile,
+} from "./ethnicity-calibration.js?v=1";
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 import { SOURCES, SOURCE_ORDER } from "./sources.js?v=1";
 import { formatHrvDisplay, formatBaselineDisplay } from "./metrics-helpers.js?v=1";
-import { renderCalendar } from "./calendar.js?v=1";
+import { renderCalendar } from "./calendar.js?v=2";
+
+const SUPPORTER_PHONE = "5550148821";
+const PROVIDER_PHONE = "5550142200";
+const PROVIDER_NAME = "Dr. Elena Rivera";
 
 const $ = (id) => document.getElementById(id);
 const SCAN_DURATION_SEC = 30;
@@ -110,7 +124,7 @@ async function loadHistoryView() {
   if (!root) return;
   try {
     const [hr, bl] = await Promise.all([
-      fetch("/api/history?limit=120"),
+      fetch("/api/history?limit=500"),
       fetch(`/api/baseline?phase=${encodeURIComponent($("phaseSelect").value)}`),
     ]);
     const scans = hr.ok ? (await hr.json()).scans : [];
@@ -167,7 +181,62 @@ async function refreshBaseline() {
     "hidden",
     !($("phaseSelect").value === "pre_pregnancy" && state.baseline?.can_lock_reference)
   );
+
+  const zone = rec?.zone;
+  const showCare = zone === "amber" || zone === "red";
+  $("careActions")?.classList.toggle("hidden", !showCare);
+
   renderMetricsList();
+}
+
+function setupEquityControls() {
+  const toggle = $("equityCalibToggle");
+  const select = $("ethnicitySelect");
+  const hint = $("equityCalibHint");
+  if (!toggle || !select) return;
+
+  const params = new URLSearchParams(location.search);
+  if (params.get("ethnicity")) {
+    setEthnicityProfile(params.get("ethnicity"));
+  }
+
+  toggle.checked = isCalibrationEnabled();
+  select.value = getEthnicityProfile();
+  if (hint) hint.textContent = calibrationLabel(getEthnicity());
+
+  toggle.addEventListener("change", () => {
+    setCalibrationEnabled(toggle.checked);
+    if (hint) hint.textContent = calibrationLabel(getEthnicity());
+    saveProfile({
+      ethnicity: getEthnicity(),
+      ethnicity_calibration_enabled: toggle.checked,
+    });
+  });
+
+  select.addEventListener("change", () => {
+    setEthnicityProfile(select.value);
+    if (hint) hint.textContent = calibrationLabel(getEthnicity());
+    saveProfile({ ethnicity: select.value });
+  });
+}
+
+function setupCareActions() {
+  $("btnAlertSupporter")?.addEventListener("click", () => {
+    const body = encodeURIComponent(
+      "VitaCor demo alert: elevated cardiovascular pattern logged. Please check in (not a diagnosis)."
+    );
+    window.open(`sms:${SUPPORTER_PHONE}?body=${body}`, "_blank");
+  });
+  $("btnConnectProvider")?.addEventListener("click", () => {
+    window.open(`tel:${PROVIDER_PHONE}`, "_self");
+    setTimeout(() => {
+      const subject = encodeURIComponent("VitaCor follow-up");
+      const body = encodeURIComponent(
+        `Hello ${PROVIDER_NAME},\n\nI would like to discuss my mirror scan and symptom trends.\n\n— Maya (demo)`
+      );
+      window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+    }, 400);
+  });
 }
 
 async function initLandmarker() {
@@ -208,11 +277,17 @@ function setScanUI(active) {
   $("btnStop").classList.toggle("hidden", !active);
 }
 
+function getEthnicity() {
+  return getEthnicityProfile();
+}
+
 function computeMetrics() {
-  const { bpm, snrConf, harmonicRatio } = state.processor.estimateBPM();
+  const { bpm: rawBpm, snrConf, harmonicRatio } = state.processor.estimateBPM();
   const fps = state.processor.fps;
   const faceCoverage = state.framesTotal ? state.framesFace / state.framesTotal : 0;
-  const conf = state.processor.computeConfidence(snrConf, faceCoverage, harmonicRatio, fps);
+  let conf = state.processor.computeConfidence(snrConf, faceCoverage, harmonicRatio, fps);
+  conf = Math.min(1, conf + confidenceBoost(getEthnicity()));
+  const bpm = applyBpmCalibration(rawBpm, getEthnicity());
   return {
     bpm,
     conf,
@@ -333,7 +408,8 @@ function processFrame(video, canvas, ctx) {
 
   if (result.faceLandmarks?.length) {
     state.framesFace++;
-    const sample = extractPulseSample(ctx, result.faceLandmarks[0], w, h);
+    const raw = extractPulseSample(ctx, result.faceLandmarks[0], w, h);
+    const sample = applyPulseCalibration(raw, getEthnicity());
     if (sample != null) {
       state.pulseSamples++;
       state.processor.addSample(sample, elapsedSec);
@@ -354,8 +430,13 @@ async function startFaceScan() {
     return;
   }
   if (!state.landmarker) {
-    $("statusText").textContent = "Loading…";
-    return;
+    $("statusText").textContent = "Face tracking still loading…";
+    try {
+      await initLandmarker();
+    } catch {
+      $("statusText").textContent = "Face tracking unavailable — refresh the page";
+      return;
+    }
   }
 
   showView("scan");
@@ -426,7 +507,10 @@ async function finishScan() {
       $("phaseText").textContent = "Scan too short — try again";
     }
   } catch (err) {
-    $("phaseText").textContent = err.message || "Analysis failed";
+    const msg = err.message || "Analysis failed";
+    $("phaseText").textContent = msg.includes("fetch") || msg.includes("Failed")
+      ? "Scan server offline — run npm run dev:rppg"
+      : msg;
   }
 
   setTimeout(() => {
@@ -510,24 +594,72 @@ async function boot() {
   );
 
   setPickerIndex(sourceIndex);
+  setupEquityControls();
+  setupCareActions();
 
+  if (!window.isSecureContext) {
+    $("statusText").textContent = "Camera needs HTTPS — use ngrok on iPhone";
+    return;
+  }
+
+  $("statusText").textContent = "Loading face tracking…";
   try {
     await initLandmarker();
+  } catch (err) {
+    console.error(err);
+    $("statusText").textContent =
+      "Face tracking failed — check network (MediaPipe CDN) and refresh";
+    return;
+  }
+
+  let apiOnline = false;
+  try {
+    const health = await fetch("/api/health", { signal: AbortSignal.timeout(4000) });
+    apiOnline = health.ok;
+  } catch {
+    apiOnline = false;
+  }
+
+  if (!apiOnline) {
+    $("statusText").textContent =
+      "Start scan server: npm run dev:rppg (port 8000), then refresh";
+  }
+
+  try {
     const p = await fetch("/api/profile").then((r) => (r.ok ? r.json() : {}));
     if (p.routine_time) {
       $("routineTime").value = p.routine_time;
       updateRoutineHint(p.routine_time);
     }
     if (p.phase) $("phaseSelect").value = p.phase;
-    saveProfile({ routine_time: $("routineTime").value, phase: $("phaseSelect").value });
+    if (p.ethnicity) {
+      setEthnicityProfile(p.ethnicity);
+      if ($("ethnicitySelect")) $("ethnicitySelect").value = p.ethnicity;
+    }
+    if (typeof p.ethnicity_calibration_enabled === "boolean" && $("equityCalibToggle")) {
+      $("equityCalibToggle").checked = p.ethnicity_calibration_enabled;
+      setCalibrationEnabled(p.ethnicity_calibration_enabled);
+    }
+    if (apiOnline) {
+      saveProfile({
+        routine_time: $("routineTime").value,
+        phase: $("phaseSelect").value,
+        ethnicity: getEthnicity(),
+        ethnicity_calibration_enabled: isCalibrationEnabled(),
+      });
+    }
+  } catch {
+    /* profile optional when offline */
+  }
+
+  if (apiOnline) {
     await loadLatest();
     await refreshBaseline();
     await loadHistoryView();
-    $("statusText").textContent = window.isSecureContext
-      ? `Daily scan · ${formatTime12h($("routineTime").value)}`
-      : "Use ngrok https:// on iPhone";
-  } catch {
-    $("statusText").textContent = "Refresh to load scanner";
+  }
+
+  if (apiOnline) {
+    $("statusText").textContent = `Daily scan · ${formatTime12h($("routineTime").value)}`;
   }
 }
 

@@ -36,6 +36,8 @@ WEB = ROOT / "web"
 VISION = ROOT / "vision"
 LATEST = VISION / "latest_scan.json"
 HISTORY = VISION / "scan_history.jsonl"
+DEMO_HISTORY = VISION / "demo_scan_history.jsonl"
+DEMO_PROFILE = VISION / "demo_user_profile.json"
 PROFILE = VISION / "user_profile.json"
 UPLOADS = VISION / "uploads"
 
@@ -53,6 +55,8 @@ class ProfilePayload(BaseModel):
     routine_time: str | None = None
     reference_bpm: float | None = None
     lock_reference_from_scans: bool = False
+    ethnicity: str | None = None
+    ethnicity_calibration_enabled: bool | None = None
 
 
 class ScanPayload(BaseModel):
@@ -113,8 +117,62 @@ def _persist_scan(data: dict) -> Path:
     return LATEST
 
 
+def _apply_demo_timeline() -> int:
+    """Copy Maya demo scans + profile into active storage. Returns scan count."""
+    if not DEMO_HISTORY.is_file():
+        return len(_load_history())
+    HISTORY.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(DEMO_HISTORY, HISTORY)
+    lines = [
+        line.strip()
+        for line in DEMO_HISTORY.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if lines:
+        LATEST.write_text(lines[-1] + "\n", encoding="utf-8")
+    if DEMO_PROFILE.is_file():
+        shutil.copyfile(DEMO_PROFILE, PROFILE)
+    return len(lines)
+
+
+def _seed_demo_scan_data() -> None:
+    """Load Maya demo scan timeline when no real history exists yet."""
+    if _load_history():
+        return
+    _apply_demo_timeline()
+
+
+@app.post("/api/demo/ensure")
+def ensure_maya_demo():
+    """
+    Idempotent: ensure Maya longitudinal scans exist.
+    If history is empty or thin (<50 scans), reload full demo timeline.
+    New scans you take after this are still appended on top.
+    """
+    existing = _load_history(5000)
+    if len(existing) >= 50:
+        profile = _load_profile()
+        if not profile.get("reference_bpm") and DEMO_PROFILE.is_file():
+            demo = json.loads(DEMO_PROFILE.read_text(encoding="utf-8"))
+            _save_profile({k: v for k, v in demo.items() if k != "updated_at"})
+        return {
+            "ok": True,
+            "scan_count": len(existing),
+            "reloaded": False,
+            "message": "Timeline already loaded — new scans will append.",
+        }
+    count = _apply_demo_timeline()
+    return {
+        "ok": True,
+        "scan_count": count,
+        "reloaded": True,
+        "message": "Loaded Maya demo timeline (pre-conception → postpartum).",
+    }
+
+
 @app.on_event("startup")
 def startup_preload_rppg():
+    _seed_demo_scan_data()
     preload_model()
 
 
@@ -145,7 +203,8 @@ def latest():
 
 @app.get("/api/history")
 def history(limit: int = 20, trustworthy_only: bool = False):
-    scans = _load_history(limit * 3 if trustworthy_only else limit)
+    cap = min(max(limit, 1), 500)
+    scans = _load_history(cap * 3 if trustworthy_only else cap)
     if trustworthy_only:
         scans = [s for s in scans if enrich_scan(s).get("trustworthy")][-limit:]
     else:
@@ -187,7 +246,7 @@ def baseline(user_id: str | None = None, phase: str | None = None):
     """
     profile = _load_profile()
     phase = phase or profile.get("phase") or "pregnancy"
-    scans = filter_for_baseline(_load_history(200))
+    scans = filter_for_baseline(_load_history(500))
     if user_id:
         scans = [s for s in scans if s.get("user_id") == user_id]
 

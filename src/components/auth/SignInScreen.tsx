@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import { useAuth } from "@/context/AuthContext";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { setAuthenticated } from "@/lib/authSession";
+import {
+  activateMayaDemoSession,
+  isMayaDemoEmail,
+  MAYA_DEMO_PASSWORD,
+} from "@/lib/demo/mayaDemo";
 import {
   loadAccountEmail,
   saveAccountEmail,
@@ -30,8 +34,20 @@ export function SignInScreen() {
   const [error, setError] = useState<string | null>(null);
 
   async function handleDemoSignIn(email: string, password: string) {
+    const normalized = email.trim().toLowerCase();
+
+    if (isMayaDemoEmail(normalized)) {
+      if (password !== MAYA_DEMO_PASSWORD && !verifyPassword(password)) {
+        setError("Email or password is incorrect.");
+        return;
+      }
+      await activateMayaDemoSession();
+      router.replace("/");
+      return;
+    }
+
     const storedEmail = loadAccountEmail();
-    if (email.trim().toLowerCase() !== storedEmail.toLowerCase()) {
+    if (normalized !== storedEmail.toLowerCase()) {
       setError("Email or password is incorrect.");
       return;
     }
@@ -85,8 +101,7 @@ export function SignInScreen() {
 
   return (
     <AuthShell>
-      <FirebaseSetupNotice />
-      <div className="flex flex-1 flex-col px-5 pb-8 pt-6">
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-2 pt-0">
         <Link
           href="/welcome"
           className="text-muted hover:text-ink mb-6 inline-flex items-center gap-1 text-sm font-medium"
@@ -98,7 +113,6 @@ export function SignInScreen() {
         <p className="text-muted mt-2 text-sm leading-relaxed">
           Welcome back. Sign in to continue tracking your heart health.
         </p>
-
         <div className="mt-8">
           <SignInForm
             onSubmit={handleSignIn}

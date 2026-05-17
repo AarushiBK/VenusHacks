@@ -26,7 +26,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-base font-semibold transition focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98] ${variants[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`ios-touch-target inline-flex items-center justify-center gap-2 px-5 py-3.5 transition focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
       {...props}
     >
       {children}

@@ -30,7 +30,7 @@ export function PageShell({
     <>
       <main className="min-h-dvh w-full pb-32">
         {showHeader && (
-          <header className="sticky top-0 z-30 flex items-center justify-between border-b border-blush/50 bg-cream/85 px-5 py-3 backdrop-blur-md">
+          <header className="sticky top-0 z-30 flex items-center justify-between border-b border-blush/50 bg-cream/85 px-5 pb-3 pt-1 backdrop-blur-md">
             <p className="text-rose-deep text-[11px] font-bold tracking-[0.18em] uppercase">
               {BRAND.name}
             </p>

@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import { useAuth } from "@/context/AuthContext";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { setAuthenticated } from "@/lib/authSession";
+import { activateMayaDemoSession, isMayaDemoEmail } from "@/lib/demo/mayaDemo";
 import { saveAccountEmail, savePassword } from "@/lib/profileStorage";
 import {
   isGoogleUser,
@@ -66,6 +66,11 @@ function SignUpContent() {
   }
 
   async function handleDemoSignUp(data: SignUpFormState) {
+    if (isMayaDemoEmail(data.email)) {
+      await activateMayaDemoSession();
+      router.replace("/");
+      return;
+    }
     saveAccountEmail(data.email.trim());
     savePassword(data.password);
     const firstName = data.fullName.trim().split(/\s+/)[0] ?? "Alex";
@@ -125,8 +130,7 @@ function SignUpContent() {
 
   return (
     <AuthShell>
-      <FirebaseSetupNotice />
-      <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-8 pt-6">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5 pb-2 pt-0">
         <Link
           href={skipAccountStep ? "/login" : "/welcome"}
           className="text-muted hover:text-ink mb-4 inline-flex items-center gap-1 text-sm font-medium"

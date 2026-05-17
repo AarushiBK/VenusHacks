@@ -28,7 +28,7 @@ export const DEFAULT_EMERGENCY_CONTACTS: EmergencyContactsState = {
   },
 };
 
-export const DEFAULT_ACCOUNT_EMAIL = "alex.care@example.com";
+export const DEFAULT_ACCOUNT_EMAIL = "maya.chen@vitacor.demo";
 
 const CONTACTS_KEY = "carechain-emergency-contacts";
 const EMAIL_KEY = "carechain-account-email";
