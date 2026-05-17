@@ -50,6 +50,8 @@ export const FEATURES = [
   },
 ] as const;
 
+export type TimelineEventStatus = "ok" | "caution" | "insight";
+
 export const TIMELINE_EVENTS = [
   { id: "1", label: "First pregnancy", phase: "Pregnancy", year: "2022", status: "ok" as const },
   { id: "2", label: "Gestational hypertension", phase: "Pregnancy", year: "2022", status: "caution" as const },

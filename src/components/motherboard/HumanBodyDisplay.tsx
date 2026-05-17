@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { getScanById } from "@/lib/passportScans";
+import { ScanPreviewPopover } from "./ScanPreviewPopover";
 
 const HumanBodyScene = dynamic(
   () =>
@@ -17,13 +19,22 @@ const HumanBodyScene = dynamic(
   },
 );
 
-export function HumanBodyDisplay() {
+export function HumanBodyDisplay({
+  selectedScanId,
+  onSelectScan,
+}: {
+  selectedScanId: string | null;
+  onSelectScan: (id: string) => void;
+}) {
+  const scan = getScanById(selectedScanId);
+
   return (
     <section
-      className="overflow-hidden rounded-2xl border border-blush/80 bg-cream shadow-sm"
-      aria-label="Human body model"
+      className="relative rounded-2xl border border-blush/80 bg-cream shadow-sm"
+      aria-label="Human body model with scan markers"
     >
-      <HumanBodyScene />
+      <HumanBodyScene selectedScanId={selectedScanId} onSelectScan={onSelectScan} />
+      <ScanPreviewPopover scan={scan ?? null} onClose={() => onSelectScan("")} />
     </section>
   );
 }

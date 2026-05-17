@@ -3,6 +3,9 @@
 import { Center, useGLTF } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { computeScanAnchorPositions } from "@/lib/bodyScanAnchors";
+import { PASSPORT_SCANS } from "@/lib/passportScans";
+import { ScanHotspots } from "./ScanHotspots";
 
 export const HUMAN_BODY_GLB_PATH = "/models/human_body.glb";
 
@@ -32,11 +35,17 @@ function applySolidBodyMaterials(object: THREE.Object3D) {
   });
 }
 
-export function HumanBodyModel() {
+export function HumanBodyModel({
+  selectedScanId,
+  onSelectScan,
+}: {
+  selectedScanId: string | null;
+  onSelectScan: (id: string) => void;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF(HUMAN_BODY_GLB_PATH);
 
-  const model = useMemo(() => {
+  const { model, anchors } = useMemo(() => {
     const clone = scene.clone(true);
     applySolidBodyMaterials(clone);
 
@@ -46,13 +55,23 @@ export function HumanBodyModel() {
     const scale = maxDim > 0 ? 1.65 / maxDim : 1;
     clone.scale.setScalar(scale);
 
-    return clone;
+    const anchorMap = computeScanAnchorPositions(clone, PASSPORT_SCANS);
+
+    return { model: clone, anchors: anchorMap };
   }, [scene]);
 
   return (
     <group ref={groupRef}>
       <Center>
-        <primitive object={model} />
+        <group>
+          <primitive object={model} />
+          <ScanHotspots
+            scans={PASSPORT_SCANS}
+            anchors={anchors}
+            selectedId={selectedScanId}
+            onSelect={onSelectScan}
+          />
+        </group>
       </Center>
     </group>
   );

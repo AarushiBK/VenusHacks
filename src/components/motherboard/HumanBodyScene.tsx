@@ -5,7 +5,13 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { HumanBodyModel } from "./HumanBodyModel";
 
-function SceneContent() {
+function SceneContent({
+  selectedScanId,
+  onSelectScan,
+}: {
+  selectedScanId: string | null;
+  onSelectScan: (id: string) => void;
+}) {
   return (
     <>
       <color attach="background" args={["#faf7f4"]} />
@@ -15,7 +21,10 @@ function SceneContent() {
       <directionalLight position={[-4, 2, -3]} intensity={0.45} color="#fff0f2" />
       <directionalLight position={[0, -1, 2]} intensity={0.25} color="#f5c4cc" />
 
-      <HumanBodyModel />
+      <HumanBodyModel
+        selectedScanId={selectedScanId}
+        onSelectScan={onSelectScan}
+      />
 
       <OrbitControls
         target={[0, 0, 0]}
@@ -33,7 +42,13 @@ function SceneContent() {
   );
 }
 
-export function HumanBodyScene() {
+export function HumanBodyScene({
+  selectedScanId,
+  onSelectScan,
+}: {
+  selectedScanId: string | null;
+  onSelectScan: (id: string) => void;
+}) {
   return (
     <div className="relative h-[min(72vw,460px)] min-h-[400px] w-full touch-none">
       <Canvas
@@ -42,11 +57,11 @@ export function HumanBodyScene() {
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <SceneContent />
+          <SceneContent selectedScanId={selectedScanId} onSelectScan={onSelectScan} />
         </Suspense>
       </Canvas>
       <p className="text-muted pointer-events-none absolute inset-x-0 bottom-2 text-center text-[11px]">
-        Drag to rotate · pinch to zoom
+        Tap a dot to view scan · drag to rotate
       </p>
     </div>
   );
