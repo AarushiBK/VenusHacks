@@ -224,16 +224,11 @@ export function SignUpForm({
               <SelectInput
                 id="pronouns"
                 value={profile.pronouns}
-                onChange={(e) => onChange({ pronouns: e.target.value })}
+                onChange={(value) => onChange({ pronouns: value })}
+                placeholder="Select pronouns"
+                options={PRONOUN_OPTIONS}
                 error={!!errors.pronouns}
-              >
-                <option value="">Select pronouns</option>
-                {PRONOUN_OPTIONS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </SelectInput>
+              />
             </FormField>
             {profile.pronouns === "Prefer to self-describe" && (
               <FormField label="Your pronouns" htmlFor="custom-pronouns" required>
@@ -249,16 +244,11 @@ export function SignUpForm({
               <SelectInput
                 id="ethnicity"
                 value={profile.ethnicity}
-                onChange={(e) => onChange({ ethnicity: e.target.value })}
+                onChange={(value) => onChange({ ethnicity: value })}
+                placeholder="Select ethnicity"
+                options={ETHNICITY_OPTIONS}
                 error={!!errors.ethnicity}
-              >
-                <option value="">Select ethnicity</option>
-                {ETHNICITY_OPTIONS.map((e) => (
-                  <option key={e} value={e}>
-                    {e}
-                  </option>
-                ))}
-              </SelectInput>
+              />
             </FormField>
             {profile.ethnicity === "Prefer to self-describe" && (
               <FormField label="Describe your ethnicity" htmlFor="custom-ethnicity" required>

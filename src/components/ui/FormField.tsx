@@ -1,4 +1,7 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
+
+export { SelectInput } from "./SelectInput";
+export type { SelectInputProps, SelectOption } from "./SelectInput";
 
 interface FormFieldProps {
   label: string;
@@ -47,19 +50,3 @@ export function TextInput({
   );
 }
 
-export function SelectInput({
-  id,
-  error,
-  children,
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement> & { error?: boolean }) {
-  return (
-    <select
-      id={id}
-      className={`${inputClassName} ${error ? "border-coral focus:border-coral focus:ring-coral/15" : ""}`}
-      {...props}
-    >
-      {children}
-    </select>
-  );
-}
