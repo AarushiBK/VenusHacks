@@ -4,8 +4,6 @@ export const PRONOUN_OPTIONS = [
   "She/her",
   "He/him",
   "They/them",
-  "She/they",
-  "He/they",
   "Prefer to self-describe",
   "Prefer not to say",
 ] as const;
