@@ -3,10 +3,10 @@ import { MobileShell } from "../components/layout/MobileShell";
 
 export function WelcomePage() {
   return (
-    <MobileShell className="overflow-hidden">
-      <div className="relative flex flex-1 flex-col">
+    <MobileShell className="overflow-visible">
+      <div className="relative flex flex-1 flex-col overflow-visible">
         <div
-          className="welcome-sky-gradient pointer-events-none absolute inset-x-0 top-0 h-[min(68%,28rem)]"
+          className="welcome-sky-gradient welcome-sky-gradient-panel pointer-events-none absolute inset-x-0 z-10"
           aria-hidden
         />
         <div

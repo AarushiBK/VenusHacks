@@ -18,13 +18,13 @@ export function IPhoneFrame({ children }: IPhoneFrameProps) {
     >
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-cream md:rounded-[2.45rem]">
         <div
-          className="pointer-events-none relative z-30 hidden shrink-0 md:block md:h-[59px]"
+          className="pointer-events-none relative z-0 hidden shrink-0 bg-transparent md:block md:h-[59px]"
           aria-hidden
         >
-          <div className="absolute left-1/2 top-[11px] h-[34px] w-[126px] -translate-x-1/2 rounded-full bg-black" />
+          <div className="absolute left-1/2 top-[11px] z-30 h-[34px] w-[126px] -translate-x-1/2 rounded-full bg-black" />
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-visible">{children}</div>
 
         <div
           className="pointer-events-none z-30 hidden shrink-0 items-center justify-center md:flex md:h-[34px]"
