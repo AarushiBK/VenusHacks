@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7a304d" />
+  <title>Sign in — VitaCor</title>
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body class="auth-page">
+  <header class="auth-header">
+    <div class="auth-logo" aria-hidden="true">♥</div>
+    <h1>VitaCor</h1>
+    <p>Your heart health hub before, during, and after pregnancy.</p>
+  </header>
+
+  <div class="auth-card">
+    <p>Sign in to continue your daily vitals routine.</p>
+    <form action="/" method="get">
+      <label class="auth-field">
+        <span>Email</span>
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" />
+      </label>
+      <label class="auth-field">
+        <span>Password</span>
+        <input type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn-auth-primary">Sign in</button>
+    </form>
+    <a href="/signup.html" class="btn-auth-secondary">Create account</a>
+  </div>
+
+  <p class="auth-footer">Not a substitute for medical advice. Always consult your care team.</p>
+</body>
+</html>

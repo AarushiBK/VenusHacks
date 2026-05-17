@@ -1,23 +1,23 @@
 /**
- * Hemodynamic Bridge — daily 30s rPPG scan (open-rppg on server)
+ * VitaCor — source picker + face scan (open-rppg)
  */
 
-import {
-  RPPGProcessor,
-  extractPulseSample,
-  drawPulseRois,
-  CONF_LOCK,
-  MIN_SCAN_SEC,
-} from "./rppg-core.js?v=5";
+import { RPPGProcessor, extractPulseSample, CONF_LOCK, MIN_SCAN_SEC } from "./rppg-core.js?v=5";
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+import { SOURCES, SOURCE_ORDER } from "./sources.js?v=1";
+import { formatHrvDisplay, formatBaselineDisplay } from "./metrics-helpers.js?v=1";
+import { renderCalendar } from "./calendar.js?v=1";
 
 const $ = (id) => document.getElementById(id);
 const SCAN_DURATION_SEC = 30;
+const RING_C = 326.73;
 const ROUTINE_KEY = "hb_routine_time";
 const PHASE_KEY = "hb_phase";
+const SOURCE_KEY = "hb_source";
 const DEFAULT_ROUTINE = "07:30";
 
 let visionTasks = null;
+let sourceIndex = SOURCE_ORDER.indexOf("face");
 
 const state = {
   mode: "idle",
@@ -28,42 +28,106 @@ const state = {
   framesFace: 0,
   pulseSamples: 0,
   startedAt: 0,
-  scanTargetSec: SCAN_DURATION_SEC,
-  history: [],
   stream: null,
   lastMpTimestampMs: 0,
   recorder: null,
   recordChunks: [],
   recordMime: "",
   baseline: null,
+  latest: null,
 };
 
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
+function currentSource() {
+  return SOURCES.find((s) => s.id === SOURCE_ORDER[sourceIndex]) || SOURCES[1];
 }
 
 function formatTime12h(hhmm) {
   const [h, m] = hhmm.split(":").map(Number);
-  const am = h < 12;
   const h12 = h % 12 || 12;
-  return `${h12}:${m.toString().padStart(2, "0")} ${am ? "AM" : "PM"}`;
+  return `${h12}:${m.toString().padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
 }
 
-function loadRoutine() {
-  const t = localStorage.getItem(ROUTINE_KEY) || DEFAULT_ROUTINE;
-  $("routineTime").value = t;
-  updateRoutineHint(t);
+function showView(name) {
+  $("viewHub").classList.toggle("hidden", name !== "hub");
+  $("viewScan").classList.toggle("hidden", name !== "scan");
+  $("viewScan").setAttribute("aria-hidden", name === "scan" ? "false" : "true");
+}
+
+function setPickerIndex(idx) {
+  sourceIndex = ((idx % SOURCE_ORDER.length) + SOURCE_ORDER.length) % SOURCE_ORDER.length;
+  const id = SOURCE_ORDER[sourceIndex];
+  localStorage.setItem(SOURCE_KEY, id);
+
+  document.querySelectorAll(".source-bubble").forEach((el) => {
+    el.classList.toggle("is-active", el.dataset.source === id);
+  });
+
+  const offset = (sourceIndex - 1) * 136;
+  $("pickerTrack").style.transform = `translateX(${-offset}px)`;
+
+  const src = currentSource();
+  $("sourceBlurb").textContent = src.blurb;
+  $("metricsTitle").textContent = `${src.label} tracks`;
+  $("btnScan").textContent = src.scanEnabled ? "Scan" : "Connect";
+
+  renderMetricsList();
+}
+
+function renderMetricsList() {
+  const src = currentSource();
+  const latest = state.latest;
+  const ul = $("metricsList");
+  ul.innerHTML = "";
+
+  src.metrics.forEach((m) => {
+    let val = m.demo;
+    if (src.id === "face" && latest) {
+      if (m.key === "bpm" && latest.bpm != null) val = `${Math.round(latest.bpm)} BPM`;
+      if (m.key === "hrv") val = formatHrvDisplay(latest);
+      if (m.key === "signal" && (latest.sqi ?? latest.confidence) != null) {
+        val = `${Math.round((latest.sqi ?? latest.confidence) * 100)}%`;
+      }
+      if (m.key === "delta") val = formatBaselineDisplay(latest, state.baseline);
+    }
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${m.label}</span><span class="val">${val}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+async function loadLatest() {
+  try {
+    const r = await fetch("/api/latest");
+    if (r.ok) state.latest = await r.json();
+    renderMetricsList();
+  } catch {
+    /* ok */
+  }
+}
+
+async function loadHistoryView() {
+  const root = $("calendarRoot");
+  if (!root) return;
+  try {
+    const [hr, bl] = await Promise.all([
+      fetch("/api/history?limit=120"),
+      fetch(`/api/baseline?phase=${encodeURIComponent($("phaseSelect").value)}`),
+    ]);
+    const scans = hr.ok ? (await hr.json()).scans : [];
+    const baseline = bl.ok ? await bl.json() : state.baseline;
+    renderCalendar(root, scans, baseline);
+  } catch {
+    root.innerHTML = "<p class='cal-detail'>Could not load history</p>";
+  }
+}
+
+function setRingProgress(pct) {
+  const off = RING_C * (1 - Math.min(1, pct));
+  $("ringProgress").style.strokeDashoffset = String(off);
 }
 
 function updateRoutineHint(hhmm) {
-  const label = formatTime12h(hhmm);
-  $("routineHint").innerHTML = `Routine: every day at <strong>${label}</strong>`;
-  $("guideTime").textContent = label;
-}
-
-function loadPhase() {
-  const p = localStorage.getItem(PHASE_KEY) || "pregnancy";
-  $("phaseSelect").value = p;
+  $("routineHint").innerHTML = `Every day at <strong>${formatTime12h(hhmm)}</strong>`;
 }
 
 async function saveProfile(patch) {
@@ -74,7 +138,7 @@ async function saveProfile(patch) {
       body: JSON.stringify(patch),
     });
   } catch {
-    /* ok offline */
+    /* ok */
   }
 }
 
@@ -85,73 +149,25 @@ async function refreshBaseline() {
     if (!r.ok) return;
     state.baseline = await r.json();
   } catch {
-    state.baseline = null;
     return;
   }
 
-  const rec = state.baseline.recovery;
+  const rec = state.baseline?.recovery;
   const badge = $("recoveryBadge");
-  if (rec?.zone && rec.zone !== "building") {
-    badge.classList.remove("hidden", "zone-green", "zone-amber", "zone-red", "zone-building");
-    badge.classList.add(`zone-${rec.zone}`);
-    $("recoveryLabel").textContent = rec.label;
-    $("recoveryDetail").textContent = rec.detail || "";
-    badge.classList.remove("hidden");
-  } else if (rec) {
-    badge.classList.remove("hidden", "zone-green", "zone-amber", "zone-red");
-    badge.classList.add("zone-building");
-    $("recoveryLabel").textContent = rec.label;
-    $("recoveryDetail").textContent = rec.detail || "";
-  }
-
-  const lockBtn = $("btnLockBaseline");
-  if (phase === "pre_pregnancy" && state.baseline?.can_lock_reference) {
-    lockBtn.classList.remove("hidden");
-  } else {
-    lockBtn.classList.add("hidden");
-  }
-
-  if (state.baseline?.reference_bpm) {
-    const ref = state.baseline.reference_bpm;
-    $("recoveryBadge").classList.remove("hidden");
-    if (!rec || rec.zone === "building") {
-      $("recoveryLabel").textContent = `Reference: ${Math.round(ref)} BPM`;
-      $("recoveryDetail").textContent = "Pre-pregnancy baseline locked.";
-    }
-  }
-}
-
-function updateDeltaMetric(bpm) {
-  const ref = state.baseline?.reference_bpm;
-  if (bpm == null || ref == null) {
-    $("valDelta").textContent = "—";
+  if (!rec) {
+    badge.classList.add("hidden");
     return;
   }
-  const d = Math.round(bpm - ref);
-  if (Math.abs(d) <= 8) $("valDelta").textContent = "OK";
-  else $("valDelta").textContent = d > 0 ? `+${d}` : `${d}`;
-}
+  badge.classList.remove("hidden", "zone-green", "zone-amber", "zone-red", "zone-building");
+  if (rec.zone) badge.classList.add(`zone-${rec.zone}`);
+  $("recoveryLabel").textContent = rec.label || "";
+  $("recoveryDetail").textContent = rec.detail || "";
 
-function cameraErrorMessage(err) {
-  if (!window.isSecureContext) {
-    return "Camera requires HTTPS — open your ngrok https:// link in Safari.";
-  }
-  const name = err?.name || "";
-  if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-    return "Allow camera: Safari → aA → Website Settings → Camera.";
-  }
-  if (name === "NotFoundError") return "No camera found.";
-  return err?.message || "Could not start camera.";
-}
-
-function qualityTip(m) {
-  if (!window.isSecureContext) return "Use the ngrok https:// link (not http).";
-  if (m.elapsed < 3) return null;
-  if (m.pulseSamples < 30) return "Brighten your forehead — daylight works best.";
-  if (m.faceCoverage < 0.8) return "Center your face in the circle.";
-  if (m.fps > 0 && m.fps < 18) return "Turn off Low Power Mode for a smoother scan.";
-  if (m.bpm > 0 && m.conf < 0.5) return "Almost there — hold still a few more seconds.";
-  return null;
+  $("btnLockBaseline").classList.toggle(
+    "hidden",
+    !($("phaseSelect").value === "pre_pregnancy" && state.baseline?.can_lock_reference)
+  );
+  renderMetricsList();
 }
 
 async function initLandmarker() {
@@ -168,12 +184,11 @@ async function initLandmarker() {
     }
     state.landmarker = null;
   }
-
   const opts = {
     baseOptions: {
       modelAssetPath:
         "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-      delegate: isIOS() ? "CPU" : "GPU",
+      delegate: /iPad|iPhone|iPod/.test(navigator.userAgent) ? "CPU" : "GPU",
     },
     runningMode: "VIDEO",
     numFaces: 1,
@@ -186,29 +201,11 @@ async function initLandmarker() {
   }
 }
 
-function setMode(mode) {
-  state.mode = mode;
-  const badge = $("recordBadge");
-  badge.classList.toggle("hidden", mode === "idle");
-  badge.classList.toggle("scanning", mode === "scanning");
-
-  $("recordLabel").textContent = mode === "scanning" ? "Scanning" : "Ready";
-  $("recordDot").classList.toggle("pulse", mode === "scanning");
-
-  $("btnStart").disabled = mode !== "idle";
-  $("btnStop").disabled = mode === "idle";
-}
-
-function setCameraUI(active) {
-  $("videoWrap").classList.toggle("camera-active", active);
+function setScanUI(active) {
   $("cameraPlaceholder").classList.toggle("hidden", active);
-  $("scanGuide").classList.toggle("hidden", !active);
+  $("scanOverlay").classList.toggle("hidden", !active);
   $("video").classList.toggle("live", active);
-}
-
-function setProgress(elapsed) {
-  const pct = Math.min(100, (elapsed / SCAN_DURATION_SEC) * 100);
-  $("scanProgress").style.width = `${pct}%`;
+  $("btnStop").classList.toggle("hidden", !active);
 }
 
 function computeMetrics() {
@@ -216,72 +213,31 @@ function computeMetrics() {
   const fps = state.processor.fps;
   const faceCoverage = state.framesTotal ? state.framesFace / state.framesTotal : 0;
   const conf = state.processor.computeConfidence(snrConf, faceCoverage, harmonicRatio, fps);
-  const hrv = state.processor.estimateHRV(bpm);
-  const elapsed = state.processor.scanSeconds;
-
-  const m = {
+  return {
     bpm,
     conf,
-    hrv,
+    hrv: state.processor.estimateHRV(bpm),
     fps,
-    elapsed,
+    elapsed: state.processor.scanSeconds,
     faceCoverage,
     pulseSamples: state.pulseSamples,
-    locked: bpm > 0 && conf >= CONF_LOCK,
-    phase: state.processor.statusLine(bpm, conf, elapsed, SCAN_DURATION_SEC),
-    tip: null,
   };
-  m.tip = qualityTip(m);
-  return m;
-}
-
-function updateMetricsUI(m) {
-  $("valBpm").textContent = m.bpm > 0 ? Math.round(m.bpm) : "—";
-  $("valHrv").textContent = m.hrv != null ? Math.round(m.hrv) : "—";
-  $("valConf").textContent =
-    m.elapsed >= MIN_SCAN_SEC && Number.isFinite(m.conf) ? `${Math.round(m.conf * 100)}%` : "—";
-
-  $("phaseText").textContent = m.phase;
-  $("timerText").textContent = formatTime(m.elapsed);
-  setProgress(m.elapsed);
-  $("metricsRow").classList.toggle("locked", m.locked);
-
-  const tipEl = $("qualityTip");
-  if (m.tip) {
-    tipEl.textContent = m.tip;
-    tipEl.hidden = false;
-  } else {
-    tipEl.hidden = true;
-  }
 }
 
 function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-async function saveScan(payload) {
-  try {
-    await fetch("/api/scan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    /* ok */
-  }
+  return `${Math.floor(sec / 60)}:${Math.floor(sec % 60)
+    .toString()
+    .padStart(2, "0")}`;
 }
 
 function pickRecordMime() {
-  for (const t of ["video/mp4", "video/webm;codecs=vp9", "video/webm"]) {
+  for (const t of ["video/mp4", "video/webm"]) {
     if (MediaRecorder.isTypeSupported(t)) return t;
   }
   return "";
 }
 
 function startRecorder(stream) {
-  if (typeof MediaRecorder === "undefined") return;
   state.recordChunks = [];
   state.recordMime = pickRecordMime();
   try {
@@ -290,7 +246,6 @@ function startRecorder(stream) {
       : new MediaRecorder(stream);
   } catch {
     state.recorder = new MediaRecorder(stream);
-    state.recordMime = state.recorder.mimeType || "video/webm";
   }
   state.recorder.ondataavailable = (e) => {
     if (e.data?.size) state.recordChunks.push(e.data);
@@ -301,16 +256,13 @@ function startRecorder(stream) {
 function stopRecorder() {
   return new Promise((resolve) => {
     if (!state.recorder || state.recorder.state === "inactive") {
-      state.recorder = null;
       resolve(null);
       return;
     }
     const rec = state.recorder;
     rec.onstop = () => {
       const type = state.recordMime || rec.mimeType || "video/webm";
-      resolve(
-        state.recordChunks.length ? new Blob(state.recordChunks, { type }) : null
-      );
+      resolve(state.recordChunks.length ? new Blob(state.recordChunks, { type }) : null);
       state.recorder = null;
       state.recordChunks = [];
     };
@@ -323,59 +275,18 @@ function stopRecorder() {
 }
 
 async function uploadRecording(blob, preview) {
-  const ext = blob.type.includes("mp4") ? ".mp4" : ".webm";
   const form = new FormData();
-  form.append("video", blob, `scan${ext}`);
+  form.append("video", blob, blob.type.includes("mp4") ? "scan.mp4" : "scan.webm");
   form.append("mode", "scan");
   form.append("scan_seconds", String(preview.elapsed));
   if (preview.fps) form.append("fps", String(preview.fps));
   form.append("timestamp", String(Date.now()));
-
   const res = await fetch("/api/scan/video", { method: "POST", body: form });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || `Server ${res.status}`);
   }
   return res.json();
-}
-
-function buildPayload(m, data = {}) {
-  return {
-    bpm: data.bpm ?? (m.bpm > 0 ? Math.round(m.bpm * 10) / 10 : null),
-    confidence: data.sqi ?? data.confidence ?? null,
-    sqi: data.sqi ?? data.confidence ?? null,
-    hrv_rmssd_ms: data.hrv_rmssd_ms ?? (m.hrv != null ? Math.round(m.hrv * 10) / 10 : null),
-    scan_seconds: Math.round(m.elapsed * 100) / 100,
-    mode: "scan",
-    timestamp: Date.now(),
-    source: data.engine ? "iphone_web_open_rppg" : "iphone_web_rppg",
-    engine: data.engine,
-    quality: data.quality,
-  };
-}
-
-function waitForVideoReady(video) {
-  return new Promise((resolve, reject) => {
-    if (video.readyState >= 2 && video.videoWidth > 0) {
-      resolve();
-      return;
-    }
-    const onReady = () => {
-      cleanup();
-      video.videoWidth > 0 ? resolve() : reject(new Error("No video frames."));
-    };
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error("Camera timeout."));
-    }, 15000);
-    const cleanup = () => {
-      clearTimeout(timeout);
-      video.removeEventListener("loadedmetadata", onReady);
-      video.removeEventListener("canplay", onReady);
-    };
-    video.addEventListener("loadedmetadata", onReady);
-    video.addEventListener("canplay", onReady);
-  });
 }
 
 async function startCamera() {
@@ -393,7 +304,11 @@ async function startCamera() {
   video.playsInline = true;
   video.muted = true;
   video.srcObject = stream;
-  await waitForVideoReady(video);
+  await new Promise((res, rej) => {
+    if (video.readyState >= 2) res();
+    else video.addEventListener("loadedmetadata", res, { once: true });
+    setTimeout(() => rej(new Error("Camera timeout")), 15000);
+  });
   await video.play();
   return video;
 }
@@ -412,23 +327,13 @@ function processFrame(video, canvas, ctx) {
   if (mpTs <= state.lastMpTimestampMs) mpTs = state.lastMpTimestampMs + 33;
   state.lastMpTimestampMs = mpTs;
 
-  let result;
-  try {
-    result = state.landmarker.detectForVideo(canvas, mpTs);
-  } catch (err) {
-    console.error(err);
-    state.rafId = requestAnimationFrame(() => processFrame(video, canvas, ctx));
-    return;
-  }
-
+  const result = state.landmarker.detectForVideo(canvas, mpTs);
   state.framesTotal++;
   const elapsedSec = (performance.now() - state.startedAt) / 1000;
 
   if (result.faceLandmarks?.length) {
     state.framesFace++;
-    const lm = result.faceLandmarks[0];
-    drawPulseRois(ctx, lm, w, h);
-    const sample = extractPulseSample(ctx, lm, w, h);
+    const sample = extractPulseSample(ctx, result.faceLandmarks[0], w, h);
     if (sample != null) {
       state.pulseSamples++;
       state.processor.addSample(sample, elapsedSec);
@@ -436,28 +341,40 @@ function processFrame(video, canvas, ctx) {
   }
 
   const m = computeMetrics();
-  updateMetricsUI(m);
-  $("jsonPreview").textContent = JSON.stringify(buildPayload(m), null, 2);
+  $("scanTimer").textContent = formatTime(elapsedSec);
+  $("phaseText").textContent =
+    elapsedSec < 5 ? "Hold still" : elapsedSec < 25 ? "Keep steady…" : "Almost done";
+  setRingProgress(elapsedSec / SCAN_DURATION_SEC);
   state.rafId = requestAnimationFrame(() => processFrame(video, canvas, ctx));
 }
 
-async function startScan() {
-  if (!state.landmarker) return;
+async function startFaceScan() {
+  if (!window.isSecureContext) {
+    $("statusText").textContent = "Use https:// (ngrok) for camera";
+    return;
+  }
+  if (!state.landmarker) {
+    $("statusText").textContent = "Loading…";
+    return;
+  }
+
+  showView("scan");
+  setScanUI(false);
+  setRingProgress(0);
+  $("scanCaption").textContent = "Align your face inside the oval";
+  $("phaseText").textContent = "Opening camera…";
 
   try {
-    await initLandmarker();
     state.processor.reset();
     state.framesTotal = 0;
     state.framesFace = 0;
     state.pulseSamples = 0;
     state.startedAt = performance.now();
     state.lastMpTimestampMs = 0;
-
-    setMode("scanning");
-    $("statusText").textContent = "Opening camera…";
+    state.mode = "scanning";
 
     const video = await startCamera();
-    setCameraUI(true);
+    setScanUI(true);
     startRecorder(state.stream);
 
     const canvas = $("canvas");
@@ -465,141 +382,149 @@ async function startScan() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    if (state.rafId) cancelAnimationFrame(state.rafId);
-    $("statusText").textContent = "30s scan — hold still, face the light";
-
     processFrame(video, canvas, ctx);
-    setTimeout(() => stopScan(), SCAN_DURATION_SEC * 1000);
+    setTimeout(() => finishScan(), SCAN_DURATION_SEC * 1000);
   } catch (err) {
     console.error(err);
-    stopScan();
-    $("statusText").textContent = cameraErrorMessage(err);
+    $("phaseText").textContent = err.message || "Camera error";
+    setTimeout(() => {
+      showView("hub");
+    }, 2000);
   }
 }
 
-async function stopScan() {
+async function finishScan() {
   if (state.rafId) cancelAnimationFrame(state.rafId);
   state.rafId = null;
 
-  const recordPromise = stopRecorder();
+  const blobP = stopRecorder();
   if (state.stream) {
     state.stream.getTracks().forEach((t) => t.stop());
     state.stream = null;
   }
+  $("video").srcObject = null;
+  setScanUI(false);
 
-  const video = $("video");
-  video.pause();
-  video.srcObject = null;
+  const finalM = state.framesTotal > 0 ? computeMetrics() : null;
+  state.mode = "idle";
+  const blob = await blobP;
 
-  setCameraUI(false);
-  setProgress(0);
+  $("phaseText").textContent = "Analyzing…";
+  setRingProgress(1);
 
-  let finalM = null;
-  if (state.framesTotal > 0) {
-    finalM = computeMetrics();
-    updateMetricsUI(finalM);
-  }
-
-  setMode("idle");
-
-  const blob = await recordPromise;
-
-  if (blob && blob.size > 80_000 && finalM && finalM.elapsed >= 24) {
-    $("statusText").textContent = "Analyzing with open-rppg…";
-    $("phaseText").textContent = "Processing your 30s scan";
-    try {
+  try {
+    if (blob && blob.size > 80_000 && finalM && finalM.elapsed >= 24) {
       const data = await uploadRecording(blob, finalM);
-      const bpm = data.bpm;
-      $("valBpm").textContent = bpm != null ? Math.round(bpm) : "—";
-      $("valHrv").textContent =
-        data.hrv_rmssd_ms != null ? Math.round(data.hrv_rmssd_ms) : "—";
-      const sqi = data.sqi ?? data.confidence;
-      $("valConf").textContent = sqi != null ? `${Math.round(sqi * 100)}%` : "—";
-      updateDeltaMetric(bpm);
-      $("jsonPreview").textContent = JSON.stringify(buildPayload(finalM, data), null, 2);
-
+      state.latest = data;
+      await loadLatest();
       await refreshBaseline();
-
-      if (bpm != null) {
-        $("statusText").textContent = `Done · ${Math.round(bpm)} BPM`;
-        $("phaseText").textContent = `Next scan tomorrow at ${formatTime12h($("routineTime").value)}`;
-      }
-      return;
-    } catch (err) {
-      console.error(err);
-      $("statusText").textContent = err.message || "Analysis failed — try again";
+      renderMetricsList();
+      await loadHistoryView();
+      $("phaseText").textContent =
+        data.bpm != null ? `Done · ${Math.round(data.bpm)} BPM` : "Complete";
+    } else {
+      $("phaseText").textContent = "Scan too short — try again";
     }
+  } catch (err) {
+    $("phaseText").textContent = err.message || "Analysis failed";
   }
 
-  if (finalM?.bpm > 0) {
-    $("statusText").textContent = "Scan ended — server analysis unavailable";
-  } else {
-    $("statusText").textContent = `Ready — scan at ${formatTime12h($("routineTime").value)}`;
+  setTimeout(() => {
+    showView("hub");
+    $("statusText").textContent = `Next scan · ${formatTime12h($("routineTime").value)}`;
+  }, 1800);
+}
+
+function onScanClick() {
+  const src = currentSource();
+  if (src.scanEnabled) {
+    startFaceScan();
+    return;
   }
+  $("statusText").textContent =
+    src.id === "watch"
+      ? "Apple Watch sync — HealthKit (coming in full app)"
+      : "Oura sync — API (coming in full app)";
 }
 
 async function boot() {
-  loadRoutine();
-  loadPhase();
+  const savedSource = localStorage.getItem(SOURCE_KEY);
+  if (savedSource) sourceIndex = Math.max(0, SOURCE_ORDER.indexOf(savedSource));
+
+  $("routineTime").value = localStorage.getItem(ROUTINE_KEY) || DEFAULT_ROUTINE;
+  updateRoutineHint($("routineTime").value);
+  $("phaseSelect").value = localStorage.getItem(PHASE_KEY) || "pregnancy";
+
+  $("pickerPrev").addEventListener("click", () => setPickerIndex(sourceIndex - 1));
+  $("pickerNext").addEventListener("click", () => setPickerIndex(sourceIndex + 1));
+  document.querySelectorAll(".source-bubble").forEach((btn) => {
+    btn.addEventListener("click", () => setPickerIndex(SOURCE_ORDER.indexOf(btn.dataset.source)));
+  });
+
+  $("btnScan").addEventListener("click", onScanClick);
+  $("btnBack").addEventListener("click", () => {
+    if (state.mode === "scanning") finishScan();
+    else showView("hub");
+  });
+
+  $("btnStop").addEventListener("click", finishScan);
 
   $("routineTime").addEventListener("change", (e) => {
-    const v = e.target.value || DEFAULT_ROUTINE;
-    localStorage.setItem(ROUTINE_KEY, v);
-    updateRoutineHint(v);
-    saveProfile({ routine_time: v });
+    localStorage.setItem(ROUTINE_KEY, e.target.value);
+    updateRoutineHint(e.target.value);
+    saveProfile({ routine_time: e.target.value });
   });
-
   $("phaseSelect").addEventListener("change", (e) => {
-    const v = e.target.value;
-    localStorage.setItem(PHASE_KEY, v);
-    saveProfile({ phase: v });
+    localStorage.setItem(PHASE_KEY, e.target.value);
+    saveProfile({ phase: e.target.value });
     refreshBaseline();
+    loadHistoryView();
   });
-
   $("btnLockBaseline").addEventListener("click", async () => {
-    $("btnLockBaseline").disabled = true;
-    try {
-      const r = await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lock_reference_from_scans: true }),
-      });
-      if (!r.ok) throw new Error("Could not lock baseline");
-      await refreshBaseline();
-      $("statusText").textContent = "Pre-pregnancy baseline locked";
-    } catch (err) {
-      $("statusText").textContent = err.message;
-    }
-    $("btnLockBaseline").disabled = false;
+    await fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lock_reference_from_scans: true }),
+    });
+    await refreshBaseline();
   });
 
-  $("btnStart").addEventListener("click", startScan);
-  $("btnStop").addEventListener("click", stopScan);
+  let touchX = 0;
+  $("pickerTrack").parentElement.addEventListener(
+    "touchstart",
+    (e) => {
+      touchX = e.touches[0].clientX;
+    },
+    { passive: true }
+  );
+  $("pickerTrack").parentElement.addEventListener(
+    "touchend",
+    (e) => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 40) setPickerIndex(sourceIndex + (dx < 0 ? 1 : -1));
+    },
+    { passive: true }
+  );
 
-  setCameraUI(false);
+  setPickerIndex(sourceIndex);
 
   try {
     await initLandmarker();
     const p = await fetch("/api/profile").then((r) => (r.ok ? r.json() : {}));
     if (p.routine_time) {
       $("routineTime").value = p.routine_time;
-      localStorage.setItem(ROUTINE_KEY, p.routine_time);
       updateRoutineHint(p.routine_time);
     }
-    if (p.phase) {
-      $("phaseSelect").value = p.phase;
-      localStorage.setItem(PHASE_KEY, p.phase);
-    }
-    saveProfile({
-      routine_time: $("routineTime").value,
-      phase: $("phaseSelect").value,
-    });
+    if (p.phase) $("phaseSelect").value = p.phase;
+    saveProfile({ routine_time: $("routineTime").value, phase: $("phaseSelect").value });
+    await loadLatest();
     await refreshBaseline();
+    await loadHistoryView();
     $("statusText").textContent = window.isSecureContext
-      ? `Ready — daily scan at ${formatTime12h($("routineTime").value)}`
+      ? `Daily scan · ${formatTime12h($("routineTime").value)}`
       : "Use ngrok https:// on iPhone";
   } catch {
-    $("statusText").textContent = "Could not load — refresh page";
+    $("statusText").textContent = "Refresh to load scanner";
   }
 }
 

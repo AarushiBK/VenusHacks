@@ -308,13 +308,61 @@ def references():
     return FileResponse(path, media_type="text/markdown")
 
 
-app.mount("/css", StaticFiles(directory=WEB / "css"), name="css")
-app.mount("/js", StaticFiles(directory=WEB / "js"), name="js")
+ASSETS_DIR = WEB / "assets"
+ICONS_DIR = WEB / "css" / "icons"
+
+
+def _safe_asset_path(name: str) -> Path:
+    """Resolve a single filename under web/assets (no path traversal)."""
+    safe = Path(name).name
+    if not safe or safe != name:
+        raise HTTPException(404, "Asset not found")
+    for base in (ASSETS_DIR, ICONS_DIR):
+        path = (base / safe).resolve()
+        try:
+            path.relative_to(base.resolve())
+        except ValueError:
+            continue
+        if path.is_file():
+            return path
+    raise HTTPException(404, "Asset not found")
+
+
+@app.get("/assets/{filename}")
+def get_asset(filename: str):
+    return FileResponse(_safe_asset_path(filename))
+
+
+@app.on_event("startup")
+def _verify_static_assets() -> None:
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    ICONS_DIR.mkdir(parents=True, exist_ok=True)
+    required = ("apple-watch.png", "oura-ring.png", "face-scan.png", "face-scan.svg")
+    missing = [f for f in required if not (ASSETS_DIR / f).is_file()]
+    if missing:
+        print(f"WARNING: missing web/assets: {', '.join(missing)}")
+    else:
+        print(f"Assets OK: {ASSETS_DIR}")
+
+
+app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+app.mount("/css", StaticFiles(directory=str(WEB / "css")), name="css")
+app.mount("/js", StaticFiles(directory=str(WEB / "js")), name="js")
 
 
 @app.get("/")
 def index():
     return FileResponse(WEB / "index.html")
+
+
+@app.get("/login.html")
+def login_page():
+    return FileResponse(WEB / "login.html")
+
+
+@app.get("/signup.html")
+def signup_page():
+    return FileResponse(WEB / "signup.html")
 
 
 if __name__ == "__main__":

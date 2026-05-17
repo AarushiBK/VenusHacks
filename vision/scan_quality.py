@@ -53,6 +53,13 @@ def enrich_scan(scan: dict[str, Any]) -> dict[str, Any]:
     sqi = sqi_of(scan)
     if sqi is not None:
         out["sqi"] = round(sqi, 3)
+    if out.get("hrv_rmssd_ms") is None:
+        detail = scan.get("hrv_detail")
+        if isinstance(detail, dict) and detail.get("rmssd") is not None:
+            try:
+                out["hrv_rmssd_ms"] = round(float(detail["rmssd"]), 1)
+            except (TypeError, ValueError):
+                pass
     return out
 
 

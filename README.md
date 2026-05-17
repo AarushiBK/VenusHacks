@@ -1,4 +1,4 @@
-# Hemodynamic Bridge — Venus Hacks
+# VitaCor (Hemodynamic Bridge) — Venus Hacks
 
 **Remote photoplethysmography (rPPG)** for long-term women's heart health (pregnancy → postpartum → lifelong baseline).
 
@@ -46,9 +46,11 @@ cd "c:\Users\aarab\New folder\VenusHacks"
 
 Terminal 1 must still run `python server/app.py`. Copy the **`https://`** URL from Terminal 2 into iPhone Safari.
 
-### 3. Use the scanner
+### 3. Use the app
 
-- **One daily 30s scan** — set your routine time (default **7:30 AM**), auto-stops  
+- **/** — main hub: rotate **Face scan · Apple Watch · Oura**, tap **Scan**  
+- **/login.html** · **/signup.html** — VitaCor auth screens (demo)  
+- **One daily 30s face scan** — set routine time (default **7:30 AM**), auto-stops  
 - Instructions for when to scan / when not to  
 - **Pre-pregnancy baseline** → pregnancy daily scans → postpartum **green / amber / red** vs reference  
 - Live **BPM preview** during scan; after 30s, video uploads → **open-rppg** BPM + **SQI** + HRV  
