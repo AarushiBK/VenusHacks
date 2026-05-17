@@ -36,6 +36,21 @@ body {
   overscroll-behavior: none;
 }
 
+.welcome-sky-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--color-burgundy) 0%,
+    color-mix(in srgb, var(--color-burgundy) 94%, var(--color-cream)) 14%,
+    color-mix(in srgb, var(--color-burgundy) 82%, var(--color-cream)) 26%,
+    color-mix(in srgb, var(--color-burgundy) 68%, var(--color-cream)) 38%,
+    color-mix(in srgb, var(--color-burgundy) 52%, var(--color-cream)) 50%,
+    color-mix(in srgb, var(--color-burgundy) 36%, var(--color-cream)) 62%,
+    color-mix(in srgb, var(--color-burgundy) 22%, var(--color-cream)) 74%,
+    color-mix(in srgb, var(--color-burgundy) 10%, var(--color-cream)) 86%,
+    var(--color-cream) 100%
+  );
+}
+
 .safe-top {
   padding-top: max(env(safe-area-inset-top, 0px), 12px);
 }
