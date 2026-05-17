@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { JourneyHeader } from "../../components/symptoms/JourneyHeader";
-import { MoodFlower } from "../../components/symptoms/MoodFlower";
+import { MoodHeart } from "../../components/symptoms/MoodHeart";
 import { useSymptomLogDraft } from "../../context/SymptomLogDraftContext";
 import { getMoodTheme } from "../../lib/moodTheme";
 
@@ -34,7 +34,7 @@ export function SymptomMoodPage() {
         </h1>
 
         <div className="my-6 flex flex-1 flex-col items-center justify-center">
-          <MoodFlower mood={draft.mood} />
+          <MoodHeart mood={draft.mood} />
           <p
             className="mood-accent-smooth mt-6 font-display text-2xl font-bold"
             style={{ color: theme.ink }}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { JourneyHeader } from "../../components/symptoms/JourneyHeader";
-import { MoodFlower } from "../../components/symptoms/MoodFlower";
+import { MoodHeart } from "../../components/symptoms/MoodHeart";
 import { SymptomPill } from "../../components/symptoms/SymptomPill";
 import { SymptomSearchBar } from "../../components/symptoms/SymptomSearchBar";
 import { getDefaultSymptomsForMood } from "../../constants/moodSymptomDefaults";
@@ -77,7 +77,7 @@ export function SymptomSelectPage() {
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-2">
         <div className="shrink-0 text-center">
-          <MoodFlower mood={draft.mood} size="md" />
+          <MoodHeart mood={draft.mood} size="md" />
           <p
             className="mt-2 font-display text-xl font-bold"
             style={{ color: theme.ink }}

@@ -4,7 +4,7 @@ import {
 } from "../../lib/symptomDisplay";
 import { getMoodLabel } from "../../lib/moodLabels";
 import type { SymptomLogEntry } from "../../types/symptoms";
-import { MoodFlower } from "./MoodFlower";
+import { MoodHeart } from "./MoodHeart";
 
 interface MomentarySymptomsTimelineProps {
   entries: SymptomLogEntry[];
@@ -20,7 +20,7 @@ export function MomentarySymptomsTimeline({ entries }: MomentarySymptomsTimeline
       {entries.map((entry) => (
         <li key={entry.id} className="flex items-start gap-3">
           <div className="shrink-0 pt-0.5">
-            <MoodFlower mood={entry.mood} size="sm" />
+            <MoodHeart mood={entry.mood} size="sm" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline justify-between gap-2">
