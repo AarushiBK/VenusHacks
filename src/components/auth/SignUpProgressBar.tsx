@@ -20,7 +20,7 @@ export function SignUpProgressBar({ currentStep }: SignUpProgressBarProps) {
 
       <div className="h-2 overflow-hidden rounded-full bg-cream-dark">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-burgundy to-coral transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-gradient-to-r from-burgundy-dark to-burgundy transition-all duration-500 ease-out"
           style={{ width: `${percent}%` }}
           role="progressbar"
           aria-valuenow={percent}

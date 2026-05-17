@@ -3,7 +3,7 @@ import * as THREE from "three";
 function muscleMaterial(color: string, transmission = 0.52): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
     color,
-    emissive: "#c97b84",
+    emissive: "#9e4f5a",
     emissiveIntensity: 0.18,
     roughness: 0.06,
     metalness: 0.08,

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import { useAuth } from "@/context/AuthContext";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import { isFirebaseConfigured } from "@/lib/firebase";
@@ -85,8 +84,7 @@ export function SignInScreen() {
 
   return (
     <AuthShell>
-      <FirebaseSetupNotice />
-      <div className="flex flex-1 flex-col px-5 pb-8 pt-6">
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-2 pt-0">
         <Link
           href="/welcome"
           className="text-muted hover:text-ink mb-6 inline-flex items-center gap-1 text-sm font-medium"
