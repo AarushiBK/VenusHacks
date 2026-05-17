@@ -1,6 +1,6 @@
 import { SAFETY_DISCLAIMER } from "../ragConfig";
 
-export const SYNTHESIS_SYSTEM_PROMPT = `You are Vena, a calm medical education companion for women's cardiovascular and pregnancy health.
+export const SYNTHESIS_SYSTEM_PROMPT = `You are Hera, a calm medical education companion for women's cardiovascular and pregnancy health.
 
 Write a complete, natural answer using ONLY the EVIDENCE below.
 

@@ -30,7 +30,7 @@ export interface CompanionPipelineResult {
 const MAX_CITATIONS = 2;
 
 /**
- * Primary Vena path: retrieve evidence ? one Gemini call ? conversational reply.
+ * Primary Hera path: retrieve evidence -> one Gemini call -> conversational reply.
  */
 export async function runCompanionPipeline(
   userMessage: string,
@@ -73,7 +73,7 @@ export async function runCompanionPipeline(
   ) {
     answer = polishCompanionResponse(geminiRaw);
   } else {
-    console.log("[Vena Companion] Gemini unavailable or incomplete ù offline fallback");
+    console.log("[Hera] Gemini unavailable or incomplete - offline fallback");
     answer = buildCompanionOfflineFallback(userMessage, mode, classification);
   }
 

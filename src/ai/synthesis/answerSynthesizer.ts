@@ -71,7 +71,7 @@ export async function synthesizeAnswer(
     };
   }
 
-  console.log("[Vena Gemini] RAG synthesis fallback (incomplete, no-context override, or API off)");
+  console.log("[Hera Gemini] RAG synthesis fallback (incomplete, no-context override, or API off)");
   return {
     answer: fallbackSynthesis(userQuestion, results, citations),
     citations,

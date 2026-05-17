@@ -104,7 +104,7 @@ export async function upsertChroma(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: CHROMA_COLLECTION,
-        metadata: { description: "Vena verified medical knowledge" },
+        metadata: { description: "Hera verified medical knowledge" },
       }),
     });
     if (!createRes.ok) {

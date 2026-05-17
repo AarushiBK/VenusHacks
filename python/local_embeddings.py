@@ -20,11 +20,11 @@ def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
         logger.info(
-            "[Vena] Loading LOCAL embedding model: %s (no API)",
+            "[Hera] Loading LOCAL embedding model: %s (no API)",
             MODEL_NAME,
         )
         _model = SentenceTransformer(MODEL_NAME)
-        logger.info("[Vena] Local model ready (dim=%s)", EMBEDDING_DIM)
+        logger.info("[Hera] Local model ready (dim=%s)", EMBEDDING_DIM)
     return _model
 
 
@@ -37,7 +37,7 @@ def encode_texts(
         return []
 
     model = get_model()
-    logger.info("[Vena] Encoding %s chunk(s) locally", len(texts))
+    logger.info("[Hera] Encoding %s chunk(s) locally", len(texts))
 
     all_embeddings: List[List[float]] = []
     for start in range(0, len(texts), batch_size):
@@ -52,5 +52,5 @@ def encode_texts(
         if on_progress:
             on_progress(len(all_embeddings), len(texts))
 
-    logger.info("[Vena] Local encoding complete: %s vectors", len(all_embeddings))
+    logger.info("[Hera] Local encoding complete: %s vectors", len(all_embeddings))
     return all_embeddings

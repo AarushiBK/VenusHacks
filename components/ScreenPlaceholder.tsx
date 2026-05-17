@@ -13,7 +13,7 @@ export function ScreenPlaceholder({ title, description }: ScreenPlaceholderProps
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-        <Text style={styles.backText}>← Back to Vena</Text>
+        <Text style={styles.backText}>← Back to Hera</Text>
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.body}>{description}</Text>

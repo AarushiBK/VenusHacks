@@ -17,7 +17,7 @@ export interface SearchResult {
 }
 
 
-const VECTOR_INDEX_KEY = "@vena/vector_index";
+const VECTOR_INDEX_KEY = "@hera/vector_index";
 let localIndex: DocumentChunk[] = [];
 let indexLoaded = false;
 
@@ -45,12 +45,12 @@ async function loadBundledIndex(): Promise<DocumentChunk[]> {
     const bundled = require("../../data/vector-index.json") as DocumentChunk[];
     if (Array.isArray(bundled) && bundled.length > 0) {
       console.log(
-        `[Vena] Loaded ${bundled.length} chunks from vector-index.json`
+        `[Hera] Loaded ${bundled.length} chunks from vector-index.json`
       );
       return bundled;
     }
   } catch {
-    console.warn("[Vena] Run npm run ingest:pdfs to build vector-index.json");
+    console.warn("[Hera] Run npm run ingest:pdfs to build vector-index.json");
   }
   return getDefaultKnowledgeBase();
 }
@@ -83,7 +83,7 @@ export async function vectorSearch(
   await ensureVectorIndexLoaded();
 
   if (Platform.OS === "web") {
-    console.log("[Vena] Web retrieval: hybrid keyword + precomputed embeddings");
+    console.log("[Hera] Web retrieval: hybrid keyword + precomputed embeddings");
     const hybrid = webHybridSearch(query, localIndex, topK * 2);
     const filtered = filterByThreshold(hybrid, topK, true);
     if (filtered.length > 0) return filtered;

@@ -24,10 +24,10 @@ interface VoiceAssistantProps {
 }
 
 const STATE_LABELS: Record<VoiceState, string> = {
-  idle: "Tap to speak with Vena",
+  idle: "Tap to speak with Hera",
   listening: "Listening...",
   processing: "Thinking...",
-  speaking: "Vena is speaking",
+  speaking: "Hera is speaking",
 };
 
 export function VoiceAssistant({
@@ -134,7 +134,7 @@ export function VoiceAssistant({
             <Ionicons name="close" size={28} color={colors.white} />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Vena Voice</Text>
+          <Text style={styles.title}>Hera Voice</Text>
           <Text style={styles.subtitle}>{STATE_LABELS[voiceState]}</Text>
 
           <Animated.View
@@ -175,7 +175,7 @@ export function VoiceAssistant({
 
           {response ? (
             <View style={styles.responseBox}>
-              <Text style={styles.label}>Vena</Text>
+              <Text style={styles.label}>Hera</Text>
               <Text style={styles.response} numberOfLines={6}>
                 {response}
               </Text>

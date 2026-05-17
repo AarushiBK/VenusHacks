@@ -17,21 +17,21 @@ import { colors } from "@/src/theme/colors";
 import { processMessageStreaming } from "@/src/ai/assistantPipeline";
 import type { AssistantResponse, ChatMessage } from "@/src/ai/types";
 
-interface VenaChatProps {
+interface HeraChatProps {
   onNavigate?: (screen: string) => void;
   emotionalSupportMode?: boolean;
 }
 
-export function VenaChat({
+export function HeraChat({
   onNavigate,
   emotionalSupportMode = false,
-}: VenaChatProps) {
+}: HeraChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       role: "assistant",
       content:
-        "Hi, I'm Vena â€” your companion for heart and pregnancy health. Ask me anything, or say something like \"show my heart trends.\"",
+        "Hi, I'm Hera — your companion for heart and pregnancy health. Ask me anything, or say something like \"show my heart trends.\"",
       timestamp: Date.now(),
     },
   ]);
@@ -159,7 +159,7 @@ export function VenaChat({
       >
         <TextInput
           style={styles.input}
-          placeholder="Ask Vena anything..."
+          placeholder="Ask Hera anything..."
           placeholderTextColor={colors.textMuted}
           value={input}
           onChangeText={setInput}

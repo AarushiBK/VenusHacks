@@ -8,7 +8,7 @@ export interface OutOfScopeResult {
 
 export function runOutOfScope(userMessage: string, isGreeting: boolean): OutOfScopeResult {
   const text = isGreeting
-    ? "Hello! I'm Vena, your women's heart and pregnancy health companion. Ask me about heart health, pregnancy cardiovascular risks, vitals, or say \"show my heart trends.\""
+    ? "Hello! I'm Hera, your women's heart and pregnancy health companion. Ask me about heart health, pregnancy cardiovascular risks, vitals, or say \"show my heart trends.\""
     : "I'm focused on women's cardiovascular and pregnancy-related health, vitals, mood support, and navigating this app. I can't help with that topic, but I'm here for health education and safety guidance.";
 
   return {

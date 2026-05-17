@@ -35,9 +35,9 @@ export const COMPANION_DISCLAIMER =
   "I'm here for education and support—not to replace your care team.";
 
 export const CHROMA_COLLECTION =
-  process.env.EXPO_PUBLIC_CHROMA_COLLECTION ?? "vena_medical";
+  process.env.EXPO_PUBLIC_CHROMA_COLLECTION ?? "hera_medical";
 
-export const GROUNDED_SYSTEM_PROMPT = `You are Vena, a medical education assistant for women's cardiovascular and pregnancy health.
+export const GROUNDED_SYSTEM_PROMPT = `You are Hera, a medical education assistant for women's cardiovascular and pregnancy health.
 
 STRICT RULES:
 1. Answer ONLY using facts explicitly written in VERIFIED CONTEXT.

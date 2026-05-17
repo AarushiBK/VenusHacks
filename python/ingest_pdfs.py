@@ -23,7 +23,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
-logger = logging.getLogger("vena.ingest")
+logger = logging.getLogger("hera.ingest")
 
 load_dotenv(ROOT / ".env")
 
@@ -36,7 +36,7 @@ CHROMA_HOST = (
     .replace("http://", "")
     .replace("https://", "")
 )
-CHROMA_COLLECTION = os.getenv("EXPO_PUBLIC_CHROMA_COLLECTION", "vena_medical")
+CHROMA_COLLECTION = os.getenv("EXPO_PUBLIC_CHROMA_COLLECTION", "hera_medical")
 
 
 def normalize_pdf_key(filename: str) -> str:
@@ -139,7 +139,7 @@ def chunk_metadata(content: str, doc_meta: dict) -> dict:
 
 
 def main() -> None:
-    logger.info("=== Vena PDF ingest (LOCAL embeddings: %s) ===", MODEL_NAME)
+    logger.info("=== Hera PDF ingest (LOCAL embeddings: %s) ===", MODEL_NAME)
     logger.info("Gemini is NOT used for embeddings.")
 
     pdf_files = collect_pdfs()

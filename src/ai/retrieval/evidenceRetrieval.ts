@@ -42,7 +42,7 @@ export async function retrieveMedicalEvidence(
   const hasStrongEvidence = meetsRetrievalConfidence(reranked);
 
   console.log(
-    "[Vena RAG] evidence retrieval chunks=",
+    "[Hera RAG] evidence retrieval chunks=",
     topChunks.length,
     "strong=",
     hasStrongEvidence,

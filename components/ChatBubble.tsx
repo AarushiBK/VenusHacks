@@ -40,7 +40,7 @@ export function ChatBubble({
         ]}
       >
         {!isUser && (
-          <Text style={styles.venaLabel}>Vena</Text>
+          <Text style={styles.heraLabel}>Hera</Text>
         )}
         <Text
           style={[
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     borderColor: colors.emergency,
     borderWidth: 1.5,
   },
-  venaLabel: {
+  heraLabel: {
     fontSize: 11,
     fontWeight: "600",
     color: colors.crimson,

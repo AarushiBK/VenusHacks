@@ -22,12 +22,12 @@ let extractor: FeatureExtractionPipeline | null = null;
 async function getExtractor(): Promise<FeatureExtractionPipeline> {
   if (!extractor) {
     console.log(
-      `[Vena Embeddings] Loading LOCAL model: ${MODEL_ID} (native, dim=${EMBEDDING_DIM})`
+      `[Hera Embeddings] Loading LOCAL model: ${MODEL_ID} (native, dim=${EMBEDDING_DIM})`
     );
     extractor = await pipeline("feature-extraction", MODEL_ID, {
       quantized: true,
     });
-    console.log("[Vena Embeddings] Native local model ready");
+    console.log("[Hera Embeddings] Native local model ready");
   }
   return extractor;
 }
@@ -51,7 +51,7 @@ export async function generateEmbeddings(
   }
 
   if (texts.length === 1) {
-    console.log(`[Vena Embeddings] Query embedded locally (${EMBEDDING_DIM}d)`);
+    console.log(`[Hera Embeddings] Query embedded locally (${EMBEDDING_DIM}d)`);
   }
 
   return results;

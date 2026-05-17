@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { ChatMessage } from "./types";
 
-const MEMORY_KEY = "@vena/assistant_memory";
+const MEMORY_KEY = "@hera/assistant_memory";
 const MAX_MESSAGES = 20;
 
 export class AssistantMemory {

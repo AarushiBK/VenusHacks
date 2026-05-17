@@ -22,7 +22,7 @@ export function formatConversationHistory(
   }
 
   const lines = recent.map((m) => {
-    const who = m.role === "user" ? "User" : "Vena";
+    const who = m.role === "user" ? "User" : "Hera";
     const text = m.content.trim().replace(/\n{3,}/g, "\n\n");
     return `${who}: ${text}`;
   });

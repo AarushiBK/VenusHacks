@@ -48,7 +48,7 @@ export function TypingAnimation({ visible = true }: TypingAnimationProps) {
   if (!visible) return null;
 
   return (
-    <View style={styles.container} accessibilityLabel="Vena is typing">
+    <View style={styles.container} accessibilityLabel="Hera is typing">
       {[dot1, dot2, dot3].map((opacity, i) => (
         <Animated.View
           key={i}

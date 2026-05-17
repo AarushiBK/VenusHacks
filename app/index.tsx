@@ -9,7 +9,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { VenaChat } from "@/components/VenaChat";
+import { HeraChat } from "@/components/HeraChat";
 import { VoiceAssistant } from "@/components/VoiceAssistant";
 import { colors } from "@/src/theme/colors";
 import type { AppScreen } from "@/src/ai/types";
@@ -50,7 +50,7 @@ export default function HomeScreen() {
           <View style={styles.headerRow}>
             <View>
               <Text style={styles.greeting}>Welcome back</Text>
-              <Text style={styles.title}>Vena</Text>
+              <Text style={styles.title}>Hera</Text>
               <Text style={styles.tagline}>
                 Your heart & pregnancy companion
               </Text>
@@ -73,7 +73,7 @@ export default function HomeScreen() {
       </LinearGradient>
 
       <View style={styles.chatContainer}>
-        <VenaChat
+        <HeraChat
           onNavigate={handleNavigate}
           emotionalSupportMode={supportMode}
         />

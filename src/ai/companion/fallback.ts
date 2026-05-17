@@ -10,7 +10,7 @@ export function buildCompanionOfflineFallback(
 
   if (mode === "OUT_OF_SCOPE" && /^(hi|hello|hey)\b/i.test(lower)) {
     return (
-      "Hi — I'm Vena, your companion for heart and pregnancy wellness. " +
+      "Hi — I'm Hera, your companion for heart and pregnancy wellness. " +
       "You can ask me about symptoms, PCOS, blood pressure, pregnancy risks, or how to prepare for a visit. " +
       "What's on your mind today?\n\n" +
       COMPANION_DISCLAIMER
