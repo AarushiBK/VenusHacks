@@ -1,19 +1,22 @@
 import { NavLink } from "react-router-dom";
 
 interface NavItem {
-  to: string;
   label: string;
   icon: string;
+  to?: string;
   end?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/", label: "Home", icon: "⌂", end: true },
-  { to: "/success", label: "Dashboard", icon: "▦" },
-  { to: "/symptoms/log", label: "Log", icon: "＋" },
+  { label: "Home", icon: "⌂" },
+  { label: "Dashboard", icon: "▦" },
+  { label: "Log", icon: "＋" },
   { to: "/symptoms", label: "Symptoms", icon: "♡", end: true },
-  { to: "/symptoms/charts", label: "Insights", icon: "◔" },
+  { label: "Insights", icon: "◔" },
 ];
+
+const itemClass =
+  "flex w-full flex-col items-center gap-0.5 rounded-xl px-1 py-2 text-[10px] font-medium transition";
 
 export function BottomNav() {
   return (
@@ -23,24 +26,38 @@ export function BottomNav() {
     >
       <ul className="flex items-center justify-around gap-1">
         {NAV_ITEMS.map((item) => (
-          <li key={item.to} className="flex-1">
-            <NavLink
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                [
-                  "flex flex-col items-center gap-0.5 rounded-xl px-1 py-2 text-[10px] font-medium transition",
-                  isActive
-                    ? "bg-burgundy/10 text-burgundy"
-                    : "text-muted active:bg-cream-dark",
-                ].join(" ")
-              }
-            >
-              <span className="text-xl leading-none" aria-hidden>
-                {item.icon}
-              </span>
-              <span className="truncate">{item.label}</span>
-            </NavLink>
+          <li key={item.label} className="flex-1">
+            {item.to ? (
+              <NavLink
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  [
+                    itemClass,
+                    isActive
+                      ? "bg-burgundy/10 text-burgundy"
+                      : "text-muted active:bg-cream-dark",
+                  ].join(" ")
+                }
+              >
+                <span className="text-xl leading-none" aria-hidden>
+                  {item.icon}
+                </span>
+                <span className="truncate">{item.label}</span>
+              </NavLink>
+            ) : (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className={`${itemClass} cursor-default text-muted/50`}
+              >
+                <span className="text-xl leading-none opacity-60" aria-hidden>
+                  {item.icon}
+                </span>
+                <span className="truncate">{item.label}</span>
+              </button>
+            )}
           </li>
         ))}
       </ul>
