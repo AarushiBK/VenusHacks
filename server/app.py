@@ -36,6 +36,8 @@ WEB = ROOT / "web"
 VISION = ROOT / "vision"
 LATEST = VISION / "latest_scan.json"
 HISTORY = VISION / "scan_history.jsonl"
+DEMO_HISTORY = VISION / "demo_scan_history.jsonl"
+DEMO_PROFILE = VISION / "demo_user_profile.json"
 PROFILE = VISION / "user_profile.json"
 UPLOADS = VISION / "uploads"
 
@@ -113,8 +115,28 @@ def _persist_scan(data: dict) -> Path:
     return LATEST
 
 
+def _seed_demo_scan_data() -> None:
+    """Load Maya demo scan timeline when no real history exists yet."""
+    if _load_history():
+        return
+    if not DEMO_HISTORY.is_file():
+        return
+    HISTORY.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(DEMO_HISTORY, HISTORY)
+    lines = [
+        line.strip()
+        for line in DEMO_HISTORY.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if lines:
+        LATEST.write_text(lines[-1] + "\n", encoding="utf-8")
+    if not PROFILE.is_file() and DEMO_PROFILE.is_file():
+        shutil.copyfile(DEMO_PROFILE, PROFILE)
+
+
 @app.on_event("startup")
 def startup_preload_rppg():
+    _seed_demo_scan_data()
     preload_model()
 
 
