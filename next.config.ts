@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
+        source: "/api/clinicaltables/:path*",
+        destination: "https://clinicaltables.nlm.nih.gov/api/:path*",
+      },
+      {
         source: "/api/:path*",
         destination: `${rppgApi}/api/:path*`,
       },

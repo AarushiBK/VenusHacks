@@ -20,6 +20,13 @@
   --color-ok: #4a7c59;
   --color-ok-bg: #edf5ef;
 
+  /* Log-in branch aliases */
+  --color-burgundy: #9e4f5a;
+  --color-burgundy-dark: #7b2d4e;
+  --color-coral: #c97b84;
+  --color-cream-dark: #f3ebe4;
+  --color-border: #e8ddd6;
+
   /* Clinical / infrastructure palette for CARECHAIN demo page */
   --color-slate: #1a1f2e;
   --color-slate-mid: #2c3347;

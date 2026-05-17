@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { clearAuthenticated } from "@/lib/authSession";
+import { isFirebaseConfigured } from "@/lib/firebase";
+import { signOut as firebaseSignOut } from "@/services/authService";
 import { BRAND } from "@/lib/carechain";
 import {
   loadAccountEmail,
@@ -182,7 +184,14 @@ export function SettingsPanel({
           <section className="border-t border-blush/60 py-5">
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  if (isFirebaseConfigured) {
+                    await firebaseSignOut();
+                  }
+                } catch {
+                  /* still clear local session */
+                }
                 clearAuthenticated();
                 onClose();
                 router.replace("/welcome");

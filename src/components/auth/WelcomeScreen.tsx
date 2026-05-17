@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { FirebaseSetupNotice } from "@/components/FirebaseSetupNotice";
 import { AuthShell } from "./AuthShell";
 
 export function WelcomeScreen() {
   return (
     <AuthShell>
+      <FirebaseSetupNotice />
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <div
           className="welcome-sky-gradient welcome-sky-gradient-panel pointer-events-none absolute inset-x-0 z-0"
