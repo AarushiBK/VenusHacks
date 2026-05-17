@@ -1,6 +1,5 @@
-import { MetricsDashboard } from "@/components/metrics/MetricsDashboard";
-import { metricsSnapshot, mockPatient } from "@/lib/metrics";
+import { FaceScannerMetrics } from "@/components/metrics/FaceScannerMetrics";
 
 export default function MetricsPage() {
-  return <MetricsDashboard snapshot={metricsSnapshot} patient={mockPatient} />;
+  return <FaceScannerMetrics />;
 }

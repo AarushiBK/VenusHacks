@@ -15,10 +15,13 @@ export function PageShell({
   active,
   children,
   showHeader = true,
+  flush = false,
 }: {
   active: NavActive;
   children: React.ReactNode;
   showHeader?: boolean;
+  /** No horizontal padding — for full-bleed embeds (e.g. face scanner) */
+  flush?: boolean;
   /** kept for backward compatibility; ignored in mobile layout */
   wide?: boolean;
 }) {
@@ -35,7 +38,7 @@ export function PageShell({
             </p>
           </header>
         )}
-        <div className="px-4 pt-2">{children}</div>
+        <div className={flush ? "p-0" : "px-4 pt-2"}>{children}</div>
       </main>
       <BottomNav active={active} />
     </>

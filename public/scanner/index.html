@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <meta name="theme-color" content="#7a304d" />
+
+  <title>VitaCor</title>
+
+  <link rel="stylesheet" href="/scanner/css/app.css?v=14" />
+  <style>
+    body.embed-mode .bottom-nav { display: none !important; }
+    body.embed-mode .view-hub { padding-bottom: 1rem; }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="viewHub" class="view view-hub">
+
+    <header class="hub-header">
+
+      <div class="hub-logo">♥</div>
+
+      <div>
+
+        <h1>VitaCor</h1>
+
+        <p id="statusText" class="hub-status">Loading…</p>
+
+      </div>
+
+    </header>
+
+
+
+    <section class="source-section" aria-label="Choose data source">
+
+      <div class="picker-arc" aria-hidden="true"></div>
+
+      <div class="source-picker">
+
+        <button type="button" id="pickerPrev" class="picker-arrow" aria-label="Previous">‹</button>
+
+        <div class="picker-viewport">
+
+          <div id="pickerTrack" class="picker-track">
+
+            <button type="button" class="source-bubble" data-source="watch">
+              <span class="bubble-icon bubble-icon--watch" role="img" aria-label="Apple Watch">
+                <img class="bubble-photo bubble-photo--watch" src="/scanner/css/icons/apple-watch.png?v=14" alt="" decoding="async" />
+              </span>
+              <span class="bubble-label">Watch</span>
+            </button>
+            <button type="button" class="source-bubble is-active" data-source="face">
+              <span class="bubble-icon bubble-icon--face" role="img" aria-label="Face scan">
+                <img class="bubble-photo bubble-photo--face" src="/scanner/css/icons/face-scan.png?v=14" alt="" decoding="async" onerror="this.onerror=null;this.src='/scanner/css/icons/face-scan.svg?v=14';" />
+              </span>
+              <span class="bubble-label">Face scan</span>
+            </button>
+            <button type="button" class="source-bubble" data-source="oura">
+              <span class="bubble-icon bubble-icon--oura" role="img" aria-label="Oura Ring">
+                <img class="bubble-photo bubble-photo--oura" src="/scanner/css/icons/oura-ring.png?v=14" alt="" decoding="async" />
+              </span>
+              <span class="bubble-label">Oura</span>
+            </button>
+
+          </div>
+
+        </div>
+
+        <button type="button" id="pickerNext" class="picker-arrow" aria-label="Next">›</button>
+
+      </div>
+
+      <p id="sourceBlurb" class="source-blurb">Camera pulse · BPM, HRV, signal quality</p>
+
+    </section>
+
+
+
+    <div id="recoveryBadge" class="recovery-badge hidden" role="status">
+
+      <span id="recoveryLabel" class="recovery-label"></span>
+
+      <span id="recoveryDetail" class="recovery-detail"></span>
+
+    </div>
+
+
+
+    <section class="metrics-card" aria-live="polite">
+
+      <p class="metrics-title" id="metricsTitle">Face scan tracks</p>
+
+      <ul id="metricsList" class="metrics-list"></ul>
+
+    </section>
+
+
+
+    <button type="button" id="btnScan" class="btn-scan">Scan</button>
+
+
+
+    <section class="history-section" aria-label="Scan history">
+
+      <p class="metrics-title">Scan history</p>
+
+      <p class="history-sub">Daily scans · color = signal quality</p>
+
+      <div id="calendarRoot" class="calendar-root"></div>
+
+    </section>
+
+
+
+    <details class="fold fold-routine">
+
+      <summary>Routine & journey</summary>
+
+      <div class="fold-body">
+
+        <label class="field">
+
+          <span class="field-label">Daily scan time</span>
+
+          <input type="time" id="routineTime" value="07:30" />
+
+        </label>
+
+        <p id="routineHint" class="routine-hint">Every day at <strong>7:30 AM</strong></p>
+
+        <label class="field">
+
+          <span class="field-label">Phase</span>
+
+          <select id="phaseSelect">
+
+            <option value="pre_pregnancy">Pre-pregnancy</option>
+
+            <option value="pregnancy" selected>Pregnancy</option>
+
+            <option value="postpartum">Postpartum</option>
+
+          </select>
+
+        </label>
+
+        <button type="button" id="btnLockBaseline" class="btn-text hidden">Lock pre-pregnancy baseline</button>
+
+      </div>
+
+    </details>
+
+
+
+    <details class="fold fold-tips">
+
+      <summary>Scan tips</summary>
+
+      <div class="fold-body">
+
+        <ul class="tips-compact">
+
+          <li>Same time daily · seated · face the light</li>
+
+          <li>30 seconds still · before coffee & exercise</li>
+
+          <li>Skip if lying down, just exercised, or in the dark</li>
+
+        </ul>
+      </div>
+    </details>
+
+
+
+    <nav class="bottom-nav" id="bottomNav">
+
+      <button type="button" class="nav-item active" data-nav="hub">Metrics</button>
+
+      <a href="/login.html" class="nav-item">Account</a>
+
+    </nav>
+
+  </div>
+
+
+
+  <div id="viewScan" class="view view-scan hidden" aria-hidden="true">
+
+    <header class="scan-top">
+
+      <button type="button" id="btnBack" class="icon-btn" aria-label="Back">←</button>
+
+      <h2>Face scanning</h2>
+
+      <span class="icon-spacer"></span>
+
+    </header>
+
+
+
+    <div id="videoWrap" class="scan-stage">
+
+      <video id="video" playsinline webkit-playsinline muted></video>
+
+      <canvas id="canvas" class="scan-canvas"></canvas>
+
+      <div id="cameraPlaceholder" class="scan-placeholder">
+
+        <div class="face-oval face-oval-static" aria-hidden="true"></div>
+
+        <p>Starting camera…</p>
+
+      </div>
+
+      <div id="scanOverlay" class="scan-overlay hidden">
+
+        <div class="face-oval" aria-hidden="true"></div>
+
+        <p id="scanCaption" class="scan-caption">Align your face inside the oval</p>
+
+      </div>
+
+      <div id="scanDim" class="scan-vignette" aria-hidden="true"></div>
+
+    </div>
+
+
+
+    <footer class="scan-footer">
+
+      <div class="progress-ring-wrap" aria-hidden="true">
+
+        <svg class="progress-ring" viewBox="0 0 120 120">
+
+          <circle class="ring-bg" cx="60" cy="60" r="52" />
+
+          <circle id="ringProgress" class="ring-fg" cx="60" cy="60" r="52" />
+
+        </svg>
+
+        <div class="ring-icon ring-icon-holo" aria-hidden="true"></div>
+
+      </div>
+
+      <p id="scanTimer" class="scan-timer">0:00</p>
+
+      <p id="phaseText" class="scan-phase">Hold still</p>
+
+      <button type="button" id="btnStop" class="btn-cancel hidden">Cancel</button>
+
+    </footer>
+
+  </div>
+
+
+
+  <script type="module" src="/scanner/js/scanner.js?v=15"></script>
+
+</body>
+
+</html>
+
