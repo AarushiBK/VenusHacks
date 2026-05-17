@@ -354,8 +354,13 @@ async function startFaceScan() {
     return;
   }
   if (!state.landmarker) {
-    $("statusText").textContent = "Loading…";
-    return;
+    $("statusText").textContent = "Face tracking still loading…";
+    try {
+      await initLandmarker();
+    } catch {
+      $("statusText").textContent = "Face tracking unavailable — refresh the page";
+      return;
+    }
   }
 
   showView("scan");
@@ -426,7 +431,10 @@ async function finishScan() {
       $("phaseText").textContent = "Scan too short — try again";
     }
   } catch (err) {
-    $("phaseText").textContent = err.message || "Analysis failed";
+    const msg = err.message || "Analysis failed";
+    $("phaseText").textContent = msg.includes("fetch") || msg.includes("Failed")
+      ? "Scan server offline — run npm run dev:rppg"
+      : msg;
   }
 
   setTimeout(() => {
@@ -508,23 +516,53 @@ async function boot() {
 
   setPickerIndex(sourceIndex);
 
+  if (!window.isSecureContext) {
+    $("statusText").textContent = "Camera needs HTTPS — use ngrok on iPhone";
+    return;
+  }
+
+  $("statusText").textContent = "Loading face tracking…";
   try {
     await initLandmarker();
+  } catch (err) {
+    console.error(err);
+    $("statusText").textContent =
+      "Face tracking failed — check network (MediaPipe CDN) and refresh";
+    return;
+  }
+
+  let apiOnline = false;
+  try {
+    const health = await fetch("/api/health", { signal: AbortSignal.timeout(4000) });
+    apiOnline = health.ok;
+  } catch {
+    apiOnline = false;
+  }
+
+  if (!apiOnline) {
+    $("statusText").textContent =
+      "Start scan server: npm run dev:rppg (port 8000), then refresh";
+  }
+
+  try {
     const p = await fetch("/api/profile").then((r) => (r.ok ? r.json() : {}));
     if (p.routine_time) {
       $("routineTime").value = p.routine_time;
       updateRoutineHint(p.routine_time);
     }
     if (p.phase) $("phaseSelect").value = p.phase;
-    saveProfile({ routine_time: $("routineTime").value, phase: $("phaseSelect").value });
+    if (apiOnline) {
+      saveProfile({ routine_time: $("routineTime").value, phase: $("phaseSelect").value });
+    }
+  } catch {
+    /* profile optional when offline */
+  }
+
+  if (apiOnline) {
     await loadLatest();
     await refreshBaseline();
     await loadHistoryView();
-    $("statusText").textContent = window.isSecureContext
-      ? `Daily scan · ${formatTime12h($("routineTime").value)}`
-      : "Use ngrok https:// on iPhone";
-  } catch {
-    $("statusText").textContent = "Refresh to load scanner";
+    $("statusText").textContent = `Daily scan · ${formatTime12h($("routineTime").value)}`;
   }
 }
 
