@@ -7,6 +7,7 @@ import {
   WEARABLE_OPTIONS,
 } from "../../constants/formOptions";
 import type { SignUpFormState, WearableProvider } from "../../types/auth";
+import { ConditionSearch } from "../health/ConditionSearch";
 import { Button } from "../ui/Button";
 import { FormField, SelectInput, TextInput } from "../ui/FormField";
 import { Toggle } from "../ui/Toggle";
@@ -350,6 +351,19 @@ export function SignUpForm({
         )}
 
         {step === 5 && (
+          <>
+            <p className="text-sm text-muted">
+              Conditions such as diabetes or endometriosis can affect cardiovascular risk,
+              especially during pregnancy. Add any that apply — you can update this later.
+            </p>
+            <ConditionSearch
+              selected={profile.preExistingConditions}
+              onChange={(preExistingConditions) => onChange({ preExistingConditions })}
+            />
+          </>
+        )}
+
+        {step === 6 && (
           <>
             <p className="text-sm text-muted">
               All connections are optional. You can add or change these anytime in settings.

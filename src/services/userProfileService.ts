@@ -31,6 +31,7 @@ function profileToDocument(
     physicalActivity: profile.physicalActivity,
     familyHeartDisease: profile.familyHeartDisease,
     familyHeartDiseaseDetails: profile.familyHeartDiseaseDetails,
+    preExistingConditions: profile.preExistingConditions,
     connectedWearables: profile.connectedWearables,
     appleHealthImport: profile.appleHealthImport,
     medicalDocuments: medicalDocuments.length
@@ -59,6 +60,7 @@ export async function getUserProfile(
   const data = snap.data();
   return {
     ...data,
+    preExistingConditions: data.preExistingConditions ?? [],
     createdAt: timestampToIso(data.createdAt),
     updatedAt: timestampToIso(data.updatedAt),
   } as UserProfileDocument;

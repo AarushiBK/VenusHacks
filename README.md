@@ -27,12 +27,14 @@ Open the URL shown in the terminal (usually `http://localhost:5173`).
 
 ## Auth flows
 
-- **Email:** Sign up (5-step wizard) → Firebase Auth + Firestore profile
+- **Email:** Sign up (6-step wizard) → Firebase Auth + Firestore profile
 - **Email sign in:** Existing users → dashboard success page (or complete profile if missing)
 - **Google:** Welcome, sign-in, or sign-up → Google popup → profile saved to Firestore
-  - New Google users complete health questions (steps 2–5) after first sign-in
+  - New Google users complete health questions (steps 2–6) after first sign-in
 
-Profiles are stored in Firestore `users/{uid}`. Optional medical document filenames are saved in the profile metadata (files are not uploaded to cloud storage).
+Profiles are stored in Firestore `users/{uid}`. Pre-existing conditions are saved with NIH condition ids and ICD codes when available. Optional medical document filenames are saved in the profile metadata (files are not uploaded to cloud storage).
+
+Condition search uses the [NIH Clinical Tables API](https://clinicaltables.nlm.nih.gov/) (proxied in dev via Vite).
 
 ## Stack
 

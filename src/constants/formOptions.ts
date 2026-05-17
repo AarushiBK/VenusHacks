@@ -95,5 +95,6 @@ export const SIGNUP_STEPS = [
   { id: 2, title: "About you", subtitle: "Basic health identifiers" },
   { id: 3, title: "Lifestyle", subtitle: "Habits that affect heart risk" },
   { id: 4, title: "Family history", subtitle: "Early heart disease in relatives" },
-  { id: 5, title: "Connect data", subtitle: "Optional — wearables & records" },
+  { id: 5, title: "Health history", subtitle: "Pre-existing conditions" },
+  { id: 6, title: "Connect data", subtitle: "Optional — wearables & records" },
 ] as const;

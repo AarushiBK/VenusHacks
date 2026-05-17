@@ -1,3 +1,5 @@
+import type { PreExistingCondition } from "./condition";
+
 export type AuthMode = "signin" | "signup";
 
 export type PhysicalActivityLevel =
@@ -27,6 +29,7 @@ export interface SignUpHealthProfile {
   physicalActivity: PhysicalActivityLevel | "";
   familyHeartDisease: boolean;
   familyHeartDiseaseDetails: string;
+  preExistingConditions: PreExistingCondition[];
   connectedWearables: WearableProvider[];
   appleHealthImport: boolean;
 }
@@ -49,6 +52,7 @@ export const initialSignUpFormState: SignUpFormState = {
   physicalActivity: "",
   familyHeartDisease: false,
   familyHeartDiseaseDetails: "",
+  preExistingConditions: [],
   connectedWearables: [],
   appleHealthImport: false,
   pendingMedicalFiles: [],

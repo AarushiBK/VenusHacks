@@ -1,4 +1,5 @@
 import type { PhysicalActivityLevel, WearableProvider } from "./auth";
+import type { PreExistingCondition } from "./condition";
 
 /** Persisted document reference (filename only; `url` is empty without cloud storage). */
 export interface MedicalDocumentMeta {
@@ -19,6 +20,7 @@ export interface UserProfileDocument {
   physicalActivity: PhysicalActivityLevel | "";
   familyHeartDisease: boolean;
   familyHeartDiseaseDetails: string;
+  preExistingConditions: PreExistingCondition[];
   connectedWearables: WearableProvider[];
   appleHealthImport: boolean;
   medicalDocuments: MedicalDocumentMeta[];
