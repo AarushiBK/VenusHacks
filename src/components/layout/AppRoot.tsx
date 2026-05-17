@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { AuthProvider } from "@/context/AuthContext";
+import { HeraAssistant } from "@/components/hera/HeraAssistant";
 import { PhoneAppShell } from "./PhoneAppShell";
 
 const AUTH_PATHS = ["/welcome", "/login", "/signup"];
@@ -19,7 +20,9 @@ export function AppRoot({ children }: { children: React.ReactNode }) {
         {isAuthFlow ? (
           <>{children}</>
         ) : (
-          <PhoneAppShell>{children}</PhoneAppShell>
+          <PhoneAppShell>
+            <HeraAssistant>{children}</HeraAssistant>
+          </PhoneAppShell>
         )}
       </AuthGate>
     </AuthProvider>
