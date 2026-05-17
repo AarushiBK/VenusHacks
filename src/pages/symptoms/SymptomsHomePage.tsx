@@ -101,7 +101,7 @@ export function SymptomsHomePage() {
           <h3 className="font-display text-lg font-semibold text-ink">About Symptoms</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted">
             Log how you feel and select warning signs before, during, and after pregnancy.
-            VitaCor helps you track patterns that may relate to cardiovascular risk.
+            VitaCore helps you track patterns that may relate to cardiovascular risk.
           </p>
         </section>
       </div>

@@ -34,7 +34,7 @@ export function MobileHeader({
       {title ? (
         <h1 className="truncate font-display text-lg font-semibold text-ink">{title}</h1>
       ) : (
-        <span className="font-display text-lg font-semibold text-burgundy">VitaCor</span>
+        <span className="font-display text-lg font-semibold text-burgundy">VitaCore</span>
       )}
     </header>
   );

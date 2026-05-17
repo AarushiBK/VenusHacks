@@ -10,7 +10,7 @@ export function WelcomePage() {
             <img src="/heart.svg" alt="" className="size-7" aria-hidden />
           </span>
           <h1 className="mt-8 font-display text-[2.75rem] font-bold leading-[1.1] tracking-tight text-white">
-            VitaCor
+            VitaCore
           </h1>
           <p className="mt-4 max-w-[300px] text-[1.05rem] leading-snug text-white/90">
             Your heart health hub before, during, and after pregnancy.

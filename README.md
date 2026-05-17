@@ -1,4 +1,4 @@
-# VitaCor
+# VitaCore
 
 Women's heart health hub for the **Heart Health at Warp Speed** track at VenusHacks. Track symptoms before, during, and after pregnancy to assess cardiovascular disease risk.
 
