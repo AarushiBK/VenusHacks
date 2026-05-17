@@ -2,37 +2,41 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { SymptomMoodCalendar } from "@/components/symptoms/SymptomMoodCalendar";
+import { SymptomMoodChart } from "@/components/symptoms/SymptomMoodChart";
+import {
+  buildCalendarMonth,
+  buildChartBuckets,
+  formatBucketRange,
+  totalEntriesInBuckets,
+  totalEntriesInCalendarMonth,
+  type ChartPeriod,
+} from "@/lib/symptomChartData";
 import { getSymptomLogs } from "@/lib/symptomLogsStorage";
-import { moodHue } from "@/lib/moodLabels";
 
-type Period = "W" | "M" | "6M" | "Y";
-
-const PERIOD_DAYS: Record<Period, number> = {
-  W: 7,
-  M: 30,
-  "6M": 180,
-  Y: 365,
+const PERIOD_LABELS: Record<ChartPeriod, string> = {
+  W: "Week",
+  M: "Month",
+  "6M": "6 months",
+  Y: "Year",
 };
 
-function filterByPeriod(entries: ReturnType<typeof getSymptomLogs>, period: Period) {
-  const cutoff = Date.now() - PERIOD_DAYS[period] * 24 * 60 * 60 * 1000;
-  return entries.filter((e) => new Date(e.createdAt).getTime() >= cutoff);
-}
-
-function formatRange(entries: ReturnType<typeof getSymptomLogs>) {
-  if (entries.length === 0) return "No data yet";
-  const dates = entries.map((e) => new Date(e.createdAt));
-  const min = new Date(Math.min(...dates.map((d) => d.getTime())));
-  const max = new Date(Math.max(...dates.map((d) => d.getTime())));
-  const fmt = (d: Date) =>
-    d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-  return `${fmt(min)} – ${fmt(max)}`;
-}
-
 export function SymptomChartsScreen() {
-  const [period, setPeriod] = useState<Period>("M");
+  const [period, setPeriod] = useState<ChartPeriod>("W");
   const all = useMemo(() => getSymptomLogs(), []);
-  const filtered = useMemo(() => filterByPeriod(all, period), [all, period]);
+  const buckets = useMemo(() => buildChartBuckets(all, period), [all, period]);
+  const calendar = useMemo(
+    () => (period === "M" ? buildCalendarMonth(all) : null),
+    [all, period],
+  );
+  const entryCount = useMemo(() => {
+    if (period === "M" && calendar) return totalEntriesInCalendarMonth(calendar);
+    return totalEntriesInBuckets(buckets);
+  }, [period, calendar, buckets]);
+  const rangeLabel = useMemo(() => {
+    if (period === "M" && calendar) return calendar.monthLabel;
+    return formatBucketRange(buckets, period);
+  }, [period, calendar, buckets]);
 
   return (
     <div className="flex min-h-full flex-col bg-cream">
@@ -47,9 +51,9 @@ export function SymptomChartsScreen() {
         <span className="w-16" aria-hidden />
       </header>
 
-      <section className="flex flex-1 flex-col gap-4 px-4 pb-6 pt-4">
+      <section className="flex min-h-0 flex-1 flex-col gap-4 px-4 pb-6 pt-4">
         <nav className="bg-cream-dark flex gap-1 rounded-xl p-1" aria-label="Time period">
-          {(["W", "M", "6M", "Y"] as Period[]).map((p) => (
+          {(["W", "M", "6M", "Y"] as ChartPeriod[]).map((p) => (
             <button
               key={p}
               type="button"
@@ -63,38 +67,28 @@ export function SymptomChartsScreen() {
             </button>
           ))}
         </nav>
+
         <p className="text-ink text-center text-sm">
-          <span className="font-semibold">{filtered.length}</span> entries
+          <span className="font-semibold">{PERIOD_LABELS[period]}</span>
+          {" · "}
+          <span className="font-semibold">{entryCount}</span>{" "}
+          {entryCount === 1 ? "log" : "logs"}
         </p>
-        <p className="text-muted text-center text-xs">{formatRange(filtered)}</p>
+        <p className="text-muted text-center text-xs">{rangeLabel}</p>
+
         <article
-          className="border-border relative min-h-[280px] flex-1 rounded-2xl border bg-white p-4"
-          aria-label="Symptom mood chart"
+          className={[
+            "border-border relative flex-1 rounded-2xl border",
+            period === "M"
+              ? "bg-cream flex min-h-[300px] flex-1 flex-col items-center justify-center p-4 shadow-[0_8px_24px_rgba(42,31,36,0.08)]"
+              : "border-border bg-cream flex min-h-0 flex-1 flex-col p-3 shadow-[0_8px_24px_rgba(42,31,36,0.08)]",
+          ].join(" ")}
+          aria-label={period === "M" ? "Symptom mood calendar" : "Symptom mood chart"}
         >
-          {filtered.length === 0 ? (
-            <p className="text-muted flex h-full items-center justify-center text-sm">
-              Log symptoms to see your history here.
-            </p>
+          {period === "M" && calendar ? (
+            <SymptomMoodCalendar calendar={calendar} />
           ) : (
-            <ul className="relative h-full min-h-[240px] list-none p-0">
-              {filtered.map((entry, i) => {
-                const x = 8 + ((i + 1) / (filtered.length + 1)) * 84;
-                const y = 92 - (entry.mood / 100) * 80;
-                const hue = moodHue(entry.mood);
-                return (
-                  <li
-                    key={entry.id}
-                    className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-sm"
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      background: `hsl(${hue} 55% 52%)`,
-                    }}
-                    title={`Mood ${entry.mood} — ${new Date(entry.createdAt).toLocaleString()}`}
-                  />
-                );
-              })}
-            </ul>
+            <SymptomMoodChart buckets={buckets} period={period} />
           )}
         </article>
       </section>

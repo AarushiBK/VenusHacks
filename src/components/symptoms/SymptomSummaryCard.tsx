@@ -4,7 +4,7 @@ import { getSymptomLabelsForEntry } from "../../lib/symptomDisplay";
 import { getMoodTheme } from "../../lib/moodTheme";
 import type { SymptomLogEntry } from "../../types/symptoms";
 import { MomentarySymptomsTimeline } from "./MomentarySymptomsTimeline";
-import { MoodFlower } from "./MoodFlower";
+import { MoodHeart } from "./MoodHeart";
 
 interface SymptomSummaryCardProps {
   dailyEntry?: SymptomLogEntry;
@@ -43,7 +43,7 @@ export function SymptomSummaryCard({ dailyEntry, momentEntries }: SymptomSummary
           Daily symptoms
         </p>
         <div className="my-2 flex justify-center">
-          <MoodFlower mood={dailyEntry!.mood} size="md" />
+          <MoodHeart mood={dailyEntry!.mood} size="md" />
         </div>
         <p className="font-display text-lg font-semibold text-ink">
           {symptomNames.length > 0

@@ -4,6 +4,19 @@ const STORAGE_KEY = "vitacor_symptom_logs";
 const DEMO_SEEDED_KEY = "vitacor_demo_symptoms_seeded";
 const DEMO_SEED_VERSION = "v2";
 
+/** Calendar day in the user's local timezone (YYYY-MM-DD). */
+export function getLocalDateKey(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export function getLogDateKey(entry: SymptomLogEntry): string {
+  if (entry.dateKey) return entry.dateKey;
+  return getLocalDateKey(new Date(entry.createdAt));
+}
+
 function readAll(): SymptomLogEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -32,6 +45,7 @@ export function saveSymptomLog(
     ...entry,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
+    dateKey: getLocalDateKey(),
   };
   writeAll([full, ...readAll()]);
   return full;
@@ -42,7 +56,7 @@ export function getLogsForDay(isoDate: string): SymptomLogEntry[] {
 }
 
 export function getTodayIsoDate(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateKey();
 }
 
 /** Seed Maya demo symptom timeline (~165 entries) for hackathon pitch. */

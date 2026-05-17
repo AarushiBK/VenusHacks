@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { JourneyHeader } from "@/components/symptoms/JourneyHeader";
-import { MoodFlower } from "@/components/symptoms/MoodFlower";
+import { MoodHeart } from "@/components/symptoms/MoodHeart";
 import { SymptomPill } from "@/components/symptoms/SymptomPill";
 import { SymptomSearchBar } from "@/components/symptoms/SymptomSearchBar";
+import { getDefaultSymptomsForMood } from "@/constants/moodSymptomDefaults";
 import { getSymptomPillLabel, searchSymptoms } from "@/constants/symptomsCatalog";
 import { useSymptomLogDraft } from "@/context/SymptomLogDraftContext";
 import { canAddCustomFromSearch } from "@/lib/symptomDisplay";
+import { getMoodBucket, isUnpleasantMoodBucket } from "@/lib/moodLabels";
 import { getMoodTheme } from "@/lib/moodTheme";
 import { saveSymptomLog } from "@/lib/symptomLogsStorage";
 
@@ -23,9 +25,25 @@ export function SymptomSelectScreen() {
   const [saving, setSaving] = useState(false);
 
   const theme = getMoodTheme(draft.mood);
-  const filtered = useMemo(() => searchSymptoms(query), [query]);
+  const moodBucket = getMoodBucket(draft.mood);
+  const defaultSymptoms = useMemo(
+    () => getDefaultSymptomsForMood(draft.mood),
+    [draft.mood],
+  );
+  const filtered = useMemo(() => {
+    if (query.trim()) return searchSymptoms(query);
+    return defaultSymptoms;
+  }, [query, defaultSymptoms]);
   const visible = showAll || query ? filtered : filtered.slice(0, INITIAL_VISIBLE);
   const hasMore = !query && !showAll && filtered.length > INITIAL_VISIBLE;
+
+  useEffect(() => {
+    setShowAll(false);
+  }, [draft.mood]);
+
+  const selectHelpTitle = isUnpleasantMoodBucket(moodBucket)
+    ? "Select all warning signs that apply. Call your provider for urgent symptoms."
+    : "Select all that apply to how you're feeling.";
   const hasSelection =
     draft.symptomIds.length > 0 || draft.customSymptoms.length > 0;
   const canAddCustom = canAddCustomFromSearch(query, draft.customSymptoms);
@@ -57,7 +75,7 @@ export function SymptomSelectScreen() {
       <JourneyHeader backTo="/symptoms/log/mood" closeTo="/symptoms" ink={theme.ink} />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-2">
         <div className="shrink-0 text-center">
-          <MoodFlower mood={draft.mood} size="md" />
+          <MoodHeart mood={draft.mood} size="md" />
           <p className="font-display mt-2 text-xl font-bold" style={{ color: theme.ink }}>
             {theme.label}
           </p>
@@ -71,7 +89,7 @@ export function SymptomSelectScreen() {
             <span
               className="flex size-5 items-center justify-center rounded-full bg-white/50 text-[10px]"
               style={{ color: theme.ink }}
-              title="Select all warning signs that apply. Call your provider for urgent symptoms."
+              title={selectHelpTitle}
             >
               i
             </span>
