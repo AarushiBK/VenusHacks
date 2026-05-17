@@ -15,10 +15,10 @@ export type WearableProvider =
   | "whoop"
   | "other";
 
-export interface SignUpProfile {
+/** Fields saved to Firestore (no secrets or local File handles). */
+export interface SignUpHealthProfile {
   fullName: string;
   email: string;
-  password: string;
   dateOfBirth: string;
   pronouns: string;
   ethnicity: string;
@@ -29,10 +29,15 @@ export interface SignUpProfile {
   familyHeartDiseaseDetails: string;
   connectedWearables: WearableProvider[];
   appleHealthImport: boolean;
-  medicalDocuments: File[];
 }
 
-export const initialSignUpProfile: SignUpProfile = {
+/** Sign-up wizard state: health profile + account password + files pending upload. */
+export interface SignUpFormState extends SignUpHealthProfile {
+  password: string;
+  pendingMedicalFiles: File[];
+}
+
+export const initialSignUpFormState: SignUpFormState = {
   fullName: "",
   email: "",
   password: "",
@@ -46,5 +51,5 @@ export const initialSignUpProfile: SignUpProfile = {
   familyHeartDiseaseDetails: "",
   connectedWearables: [],
   appleHealthImport: false,
-  medicalDocuments: [],
+  pendingMedicalFiles: [],
 };

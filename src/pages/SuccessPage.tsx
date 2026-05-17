@@ -1,7 +1,34 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { MobileShell } from "../components/layout/MobileShell";
+import { useAuth } from "../context/AuthContext";
+import { signOut } from "../services/authService";
 
 export function SuccessPage() {
+  const navigate = useNavigate();
+  const { user, loading, profile } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/sign-in", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  async function handleSignOut() {
+    await signOut();
+    navigate("/", { replace: true });
+  }
+
+  if (loading) {
+    return (
+      <MobileShell>
+        <main className="flex flex-1 items-center justify-center p-6 text-sm text-muted">
+          Loading…
+        </main>
+      </MobileShell>
+    );
+  }
+
   return (
     <MobileShell>
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center safe-bottom">
@@ -9,17 +36,27 @@ export function SuccessPage() {
           ♥
         </span>
         <h1 className="mt-6 font-display text-2xl font-semibold text-ink">
-          Welcome to VitaCor
+          Welcome{profile?.fullName ? `, ${profile.fullName.split(" ")[0]}` : ""}!
         </h1>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
-          Your profile is saved for this demo. Next up: your cardiovascular risk
-          dashboard.
+          Your profile is saved to Firebase. Your cardiovascular risk dashboard is
+          coming next.
         </p>
-        <Link
-          to="/sign-in"
+        {user?.email && (
+          <p className="mt-2 text-xs text-muted">Signed in as {user.email}</p>
+        )}
+        <button
+          type="button"
+          onClick={handleSignOut}
           className="mt-8 text-sm font-semibold text-burgundy active:underline"
         >
-          Back to sign in
+          Sign out
+        </button>
+        <Link
+          to="/"
+          className="mt-4 text-xs text-muted active:underline"
+        >
+          Back to home
         </Link>
       </main>
     </MobileShell>

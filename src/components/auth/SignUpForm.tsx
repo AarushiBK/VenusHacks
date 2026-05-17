@@ -6,22 +6,38 @@ import {
   SIGNUP_STEPS,
   WEARABLE_OPTIONS,
 } from "../../constants/formOptions";
-import type { SignUpProfile, WearableProvider } from "../../types/auth";
+import type { SignUpFormState, WearableProvider } from "../../types/auth";
 import { Button } from "../ui/Button";
 import { FormField, SelectInput, TextInput } from "../ui/FormField";
 import { Toggle } from "../ui/Toggle";
+import { AuthDivider } from "./AuthDivider";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 import { SignUpProgressBar } from "./SignUpProgressBar";
 
 interface SignUpFormProps {
-  profile: SignUpProfile;
-  onChange: (updates: Partial<SignUpProfile>) => void;
-  onSubmit: (profile: SignUpProfile) => void;
+  profile: SignUpFormState;
+  onChange: (updates: Partial<SignUpFormState>) => void;
+  onSubmit: (profile: SignUpFormState) => void;
+  skipAccountStep?: boolean;
+  initialStep?: number;
+  onGoogleSignIn?: () => void;
+  submitting?: boolean;
+  errorMessage?: string | null;
 }
 
-type FieldErrors = Partial<Record<keyof SignUpProfile | "confirmPassword", string>>;
+type FieldErrors = Partial<Record<keyof SignUpFormState | "confirmPassword", string>>;
 
-export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
-  const [step, setStep] = useState(1);
+export function SignUpForm({
+  profile,
+  onChange,
+  onSubmit,
+  skipAccountStep = false,
+  initialStep = 1,
+  onGoogleSignIn,
+  submitting,
+  errorMessage,
+}: SignUpFormProps) {
+  const [step, setStep] = useState(skipAccountStep ? Math.max(initialStep, 2) : initialStep);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [customPronouns, setCustomPronouns] = useState("");
@@ -35,7 +51,7 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
   function validateStep(): boolean {
     const next: FieldErrors = {};
 
-    if (step === 1) {
+    if (step === 1 && !skipAccountStep) {
       if (!profile.fullName.trim()) next.fullName = "Name is required";
       if (!profile.email.trim()) next.email = "Email is required";
       if (!profile.password || profile.password.length < 8) {
@@ -82,7 +98,8 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
 
   function goBack() {
     setErrors({});
-    setStep((s) => Math.max(s - 1, 1));
+    const minStep = skipAccountStep ? 2 : 1;
+    setStep((s) => Math.max(s - 1, minStep));
   }
 
   function toggleWearable(id: WearableProvider) {
@@ -94,12 +111,12 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
 
   function handleFiles(files: FileList | null) {
     if (!files) return;
-    onChange({ medicalDocuments: [...profile.medicalDocuments, ...Array.from(files)] });
+    onChange({ pendingMedicalFiles: [...profile.pendingMedicalFiles, ...Array.from(files)] });
   }
 
   function removeFile(index: number) {
     onChange({
-      medicalDocuments: profile.medicalDocuments.filter((_, i) => i !== index),
+      pendingMedicalFiles: profile.pendingMedicalFiles.filter((_, i) => i !== index),
     });
   }
 
@@ -120,9 +137,21 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
     <form onSubmit={handleSubmit} className="flex flex-col">
       <SignUpProgressBar currentStep={step} />
 
+      {errorMessage && (
+        <p className="mb-4 rounded-xl border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
+          {errorMessage}
+        </p>
+      )}
+
       <div className="flex flex-col gap-5 pb-4">
-        {step === 1 && (
+        {step === 1 && !skipAccountStep && (
           <>
+            {onGoogleSignIn && (
+              <>
+                <GoogleSignInButton onClick={onGoogleSignIn} disabled={submitting} />
+                <AuthDivider />
+              </>
+            )}
             <FormField label="Full name" htmlFor="fullname" required error={errors.fullName}>
               <TextInput
                 id="fullname"
@@ -394,9 +423,9 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
                   onChange={(e) => handleFiles(e.target.files)}
                 />
               </label>
-              {profile.medicalDocuments.length > 0 && (
+              {profile.pendingMedicalFiles.length > 0 && (
                 <ul className="space-y-2">
-                  {profile.medicalDocuments.map((file, i) => (
+                  {profile.pendingMedicalFiles.map((file, i) => (
                     <li
                       key={`${file.name}-${i}`}
                       className="flex items-center justify-between rounded-lg border border-border bg-white px-3 py-2 text-sm"
@@ -419,13 +448,17 @@ export function SignUpForm({ profile, onChange, onSubmit }: SignUpFormProps) {
       </div>
 
       <div className="sticky bottom-0 -mx-5 mt-6 flex gap-3 border-t border-border/60 bg-cream px-5 py-4 safe-bottom">
-        {step > 1 && (
-          <Button type="button" variant="secondary" onClick={goBack} className="flex-1">
+        {(step > 1 || !skipAccountStep) && step > (skipAccountStep ? 2 : 1) && (
+          <Button type="button" variant="secondary" onClick={goBack} className="flex-1" disabled={submitting}>
             Back
           </Button>
         )}
-        <Button type="submit" fullWidth className={step > 1 ? "flex-[2]" : ""}>
-          {step < SIGNUP_STEPS.length ? "Continue" : "Create account"}
+        <Button type="submit" fullWidth className={step > (skipAccountStep ? 2 : 1) ? "flex-[2]" : ""} disabled={submitting}>
+          {submitting
+            ? "Saving…"
+            : step < SIGNUP_STEPS.length
+              ? "Continue"
+              : "Create account"}
         </Button>
       </div>
     </form>

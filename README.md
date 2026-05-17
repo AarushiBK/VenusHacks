@@ -4,26 +4,35 @@ Women's heart health hub for the **Heart Health at Warp Speed** track at VenusHa
 
 ## Getting started
 
-Requires [Node.js](https://nodejs.org/) (v18+). From the project root:
+Requires [Node.js](https://nodejs.org/) (v18+).
 
 ```bash
 npm install
+cp .env.example .env
+# Fill in Firebase credentials in .env
 npm run dev
 ```
 
 Open the URL shown in the terminal (usually `http://localhost:5173`).
 
-## Auth (current)
+## Firebase setup
 
-The sign-in / sign-up flow collects:
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Add a **Web app** and copy the config into `.env` (see `.env.example`).
+3. Enable **Authentication**:
+   - **Email/Password** sign-in
+   - **Google** sign-in (add your app's domain to authorized domains; include `localhost` for dev)
+4. Create a **Firestore Database** (start in test mode, then deploy rules below).
+5. Deploy `firestore.rules` → Firestore Rules in the Firebase Console.
 
-- **Account:** name, email, password
-- **About you:** date of birth, pronouns, ethnicity
-- **Lifestyle:** smoking, vaping, physical activity
-- **Family history:** early heart disease in parents or siblings
-- **Optional:** wearable connections, Apple Health import, medical document upload
+## Auth flows
 
-Data is stored in memory for the demo until a backend is added.
+- **Email:** Sign up (5-step wizard) → Firebase Auth + Firestore profile
+- **Email sign in:** Existing users → dashboard success page (or complete profile if missing)
+- **Google:** Welcome, sign-in, or sign-up → Google popup → profile saved to Firestore
+  - New Google users complete health questions (steps 2–5) after first sign-in
+
+Profiles are stored in Firestore `users/{uid}`. Optional medical document filenames are saved in the profile metadata (files are not uploaded to cloud storage).
 
 ## Stack
 
@@ -31,3 +40,4 @@ Data is stored in memory for the demo until a backend is added.
 - Vite 6
 - Tailwind CSS 4
 - React Router 7
+- Firebase Auth, Firestore
