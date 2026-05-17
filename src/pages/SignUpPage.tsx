@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SignUpForm } from "../components/auth/SignUpForm";
 import { MobileHeader } from "../components/layout/MobileHeader";
 import { MobileShell } from "../components/layout/MobileShell";
+import { Screen } from "../components/layout/Screen";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import {
@@ -103,9 +104,9 @@ export function SignUpPage() {
     return (
       <MobileShell>
         <MobileHeader title="Complete profile" />
-        <main className="flex flex-1 items-center justify-center p-6 text-sm text-muted">
+        <Screen className="flex flex-1 items-center justify-center py-6 text-sm text-muted">
           Loading your account…
-        </main>
+        </Screen>
       </MobileShell>
     );
   }
@@ -113,7 +114,7 @@ export function SignUpPage() {
   return (
     <MobileShell>
       <MobileHeader title={skipAccountStep ? "Complete profile" : "Sign up"} />
-      <main className="flex flex-1 flex-col overflow-y-auto px-5 pb-8 pt-2 safe-bottom">
+      <Screen className="flex flex-1 flex-col overflow-y-auto pt-2 safe-bottom">
         {skipAccountStep && (
           <p className="mb-4 text-sm leading-relaxed text-muted">
             You&apos;re signed in. Finish your health profile to get started.
@@ -136,7 +137,7 @@ export function SignUpPage() {
             </Link>
           </p>
         )}
-      </main>
+      </Screen>
     </MobileShell>
   );
 }

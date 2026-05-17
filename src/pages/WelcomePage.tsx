@@ -14,7 +14,7 @@ export function WelcomePage() {
           aria-hidden
         />
 
-        <div className="relative z-10 flex flex-1 flex-col px-6 pb-8 pt-14 safe-top">
+        <div className="relative z-10 flex flex-1 flex-col px-4 pb-10 pt-8 safe-top">
           <div className="mb-auto">
             <span className="inline-flex size-14 items-center justify-center rounded-2xl bg-white/15 text-3xl backdrop-blur-sm">
               ♥
@@ -48,7 +48,7 @@ export function WelcomePage() {
             </Link>
           </div>
 
-          <p className="mt-6 text-center text-[11px] leading-relaxed text-muted">
+          <p className="mt-6 pb-2 text-center text-[11px] leading-relaxed text-muted">
             Not a substitute for medical advice. Always consult your care team.
           </p>
         </div>

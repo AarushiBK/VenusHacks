@@ -447,7 +447,7 @@ export function SignUpForm({
         )}
       </div>
 
-      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-3 border-t border-border/60 bg-cream px-5 py-4 safe-bottom">
+      <div className="sticky bottom-0 -mx-4 mt-6 flex gap-3 border-t border-border/60 bg-cream px-4 py-4 safe-bottom">
         {(step > 1 || !skipAccountStep) && step > (skipAccountStep ? 2 : 1) && (
           <Button type="button" variant="secondary" onClick={goBack} className="flex-1" disabled={submitting}>
             Back

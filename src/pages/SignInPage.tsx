@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { SignInForm } from "../components/auth/SignInForm";
 import { MobileHeader } from "../components/layout/MobileHeader";
 import { MobileShell } from "../components/layout/MobileShell";
+import { Screen } from "../components/layout/Screen";
 import { useAuth } from "../context/AuthContext";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import { signInWithEmail } from "../services/authService";
@@ -51,7 +52,7 @@ export function SignInPage() {
   return (
     <MobileShell>
       <MobileHeader title="Sign in" />
-      <main className="flex flex-1 flex-col px-5 pb-8 pt-2 safe-bottom">
+      <Screen className="flex flex-1 flex-col pt-2 safe-bottom">
         <p className="mb-6 text-sm leading-relaxed text-muted">
           Welcome back. Sign in to continue tracking your heart health.
         </p>
@@ -67,7 +68,7 @@ export function SignInPage() {
             Create an account
           </Link>
         </p>
-      </main>
+      </Screen>
     </MobileShell>
   );
 }

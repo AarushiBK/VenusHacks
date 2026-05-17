@@ -6,6 +6,7 @@ import { WelcomePage } from "./pages/WelcomePage";
 
 export default function App() {
   return (
+    <div className="flex min-h-0 flex-1 flex-col">
     <Routes>
       <Route path="/" element={<WelcomePage />} />
       <Route path="/sign-in" element={<SignInPage />} />
@@ -13,5 +14,6 @@ export default function App() {
       <Route path="/success" element={<SuccessPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </div>
   );
 }

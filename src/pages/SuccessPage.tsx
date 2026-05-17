@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MobileShell } from "../components/layout/MobileShell";
+import { Screen } from "../components/layout/Screen";
 import { useAuth } from "../context/AuthContext";
 import { signOut } from "../services/authService";
 
@@ -22,16 +23,16 @@ export function SuccessPage() {
   if (loading) {
     return (
       <MobileShell>
-        <main className="flex flex-1 items-center justify-center p-6 text-sm text-muted">
+        <Screen className="flex flex-1 items-center justify-center py-6 text-sm text-muted">
           Loading…
-        </main>
+        </Screen>
       </MobileShell>
     );
   }
 
   return (
     <MobileShell>
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center safe-bottom">
+      <Screen className="flex flex-1 flex-col items-center justify-center py-12 text-center safe-bottom">
         <span className="flex size-20 items-center justify-center rounded-full bg-burgundy/10 text-4xl">
           ♥
         </span>
@@ -58,7 +59,7 @@ export function SuccessPage() {
         >
           Back to home
         </Link>
-      </main>
+      </Screen>
     </MobileShell>
   );
 }
