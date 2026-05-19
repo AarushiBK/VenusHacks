@@ -1,5 +1,5 @@
 export const BRAND = {
-  name: "CARECHAIN CARDIO",
+  name: "VitaCore",
   tagline: "The Maternal Cardiovascular Continuity Infrastructure",
 } as const;
 

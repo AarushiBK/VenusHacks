@@ -236,7 +236,7 @@ export function buildReportDocument(params: {
   } = params;
 
   const sections: string[] = [
-    "VitaCor maternal cardiovascular care report",
+    "VitaCore maternal cardiovascular care report",
     `Patient: ${mockPatient.name} · ${mockPatient.detail}`,
     `Generated: ${new Date().toLocaleString()}`,
     "",

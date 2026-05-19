@@ -28,7 +28,7 @@ export function CareSupportActions({
 
   function alertSupporter() {
     const body = encodeURIComponent(
-      "Hi — Maya's VitaCor app flagged cardiovascular symptoms that may need attention. " +
+      "Hi — Maya's VitaCore app flagged cardiovascular symptoms that may need attention. " +
         "This is an automated supporter alert from a demo health app (not a diagnosis). " +
         "Please check in with her.",
     );
@@ -38,12 +38,12 @@ export function CareSupportActions({
   }
 
   function connectProvider() {
-    const subject = encodeURIComponent("VitaCor — cardiovascular follow-up requested");
+    const subject = encodeURIComponent("VitaCore — cardiovascular follow-up requested");
     const body = encodeURIComponent(
       `Hello ${contacts.provider.name},\n\n` +
         "Maya's longitudinal mirror scans and symptom logs suggest elevated cardiovascular load. " +
         "She would like to discuss results at your earliest availability.\n\n" +
-        "— Sent via VitaCor (demo)",
+        "— Sent via VitaCore (demo)",
     );
     const tel = `tel:${phoneDigits(contacts.provider.phone)}`;
     if (level === "critical") {

@@ -15,7 +15,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} — Maternal Cardiovascular Continuity`,
+  title: BRAND.name,
   description: BRAND.tagline,
 };
 

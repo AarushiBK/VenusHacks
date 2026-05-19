@@ -39,7 +39,7 @@ export function buildRoutingHints(
     acuteNote,
     `Confidence: ${classification.confidence.toFixed(2)}`,
     "",
-    "### VitaCor app (navigation & features)",
+    "### VitaCore app (navigation & features)",
     VITACOR_APP_GUIDE,
   ].join("\n");
 }

@@ -17,7 +17,7 @@ export function WelcomeScreen() {
               ♥
             </span>
             <h1 className="font-display mt-6 text-4xl font-semibold leading-tight tracking-tight text-white">
-              VitaCor
+              VitaCore
             </h1>
             <p className="mt-3 max-w-[340px] text-[17px] leading-relaxed text-white/88">
               Track symptoms and risk factors to protect your long-term

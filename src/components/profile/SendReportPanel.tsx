@@ -139,7 +139,7 @@ export function SendReportPanel({
       recipientPhone: recipientPhone.trim(),
     });
     if (typeof window !== "undefined") {
-      console.info("[VitaCor demo] Care report prepared for provider:\n", doc);
+      console.info("[VitaCore demo] Care report prepared for provider:\n", doc);
     }
     setStep("sent");
   }

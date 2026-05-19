@@ -28,9 +28,9 @@ export function screenToPath(screen: AppScreen): string {
   return SCREEN_ROUTES[screen];
 }
 
-/** Injected into Hera prompts so the model knows VitaCor features and tabs. */
+/** Injected into Hera prompts so the model knows VitaCore features and tabs. */
 export const VITACOR_APP_GUIDE = `
-VitaCor app map (use for navigation and feature advice only — not medical diagnosis):
+VitaCore app map (use for navigation and feature advice only — not medical diagnosis):
 
 • Home (/) — 3D heart model, wellness summary, avg vitals, awareness tips, settings & send report to provider.
 • Passport (/motherboard) — cardiovascular timeline, interactive body with scan dots (pelvic, heart echoes), tap dots for scan images.
